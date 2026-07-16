@@ -3,6 +3,7 @@ package com.team3.coffee_order.domain.entity;
 import jakarta.persistence.*;
 
 @Entity
+@Table(name = "order_items")
 public class OrderItem {
 
     @Id

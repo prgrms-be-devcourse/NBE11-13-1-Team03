@@ -6,7 +6,8 @@ import org.hibernate.annotations.SQLRestriction;
 import java.time.LocalDateTime;
 
 @Entity
-@SQLDelete(sql = "UPDATE menu SET deleted = true, deleted_at = NOW() WHERE id = ?")
+@Table(name = "menus")
+@SQLDelete(sql = "UPDATE menus SET deleted = true, deleted_at = NOW() WHERE id = ?")
 @SQLRestriction("deleted = false")
 public class Menu extends BaseEntity {
 

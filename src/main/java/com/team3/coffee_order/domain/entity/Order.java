@@ -9,8 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "`order`")  // order는 예약어라 백틱
-@SQLDelete(sql = "UPDATE `order` SET deleted = true, deleted_at = NOW() WHERE id = ?")
+@Table(name = "orders")  // order는 예약어라 테이블명을 orders로 사용
+@SQLDelete(sql = "UPDATE orders SET deleted = true, deleted_at = NOW() WHERE id = ?")
 @SQLRestriction("deleted = false")
 public class Order extends BaseEntity {
 
@@ -19,7 +19,7 @@ public class Order extends BaseEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "customer_id")
+    @JoinColumn(name = "customer_id생")
     private Customer customer;
 
     @Column(nullable = false)

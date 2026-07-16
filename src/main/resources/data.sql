@@ -1,8 +1,6 @@
-create database coffee;
-use coffee;
-
+show tables;
 -- 1. 고객
-CREATE TABLE customer (
+CREATE TABLE customers (
                           id          BIGINT       NOT NULL AUTO_INCREMENT,
                           email       VARCHAR(255) NOT NULL,
                           created_at  DATETIME(6)  NOT NULL,
@@ -13,7 +11,7 @@ CREATE TABLE customer (
 );
 
 -- 2. 메뉴
-CREATE TABLE menu (
+CREATE TABLE menus (
                       id          BIGINT       NOT NULL AUTO_INCREMENT,
                       name        VARCHAR(255) NOT NULL,
                       price       INT          NOT NULL,
@@ -25,8 +23,8 @@ CREATE TABLE menu (
                       PRIMARY KEY (id)
 );
 
--- 3. 주문 (order는 예약어라 백틱 필수)
-CREATE TABLE `order` (
+-- 3. 주문 (orders는 예약어가 아니라 백틱 불필요)
+CREATE TABLE orders (
                          id          BIGINT       NOT NULL AUTO_INCREMENT,
                          customer_id BIGINT,
                          order_date  DATE         NOT NULL,
@@ -38,11 +36,11 @@ CREATE TABLE `order` (
                          deleted_at  DATETIME(6),
                          PRIMARY KEY (id),
                          CONSTRAINT fk_order_customer
-                             FOREIGN KEY (customer_id) REFERENCES customer (id)
+                             FOREIGN KEY (customer_id) REFERENCES customers (id)
 );
 
 -- 4. 주문 항목 (Soft Delete 없음)
-CREATE TABLE order_item (
+CREATE TABLE order_items (
                             id         BIGINT NOT NULL AUTO_INCREMENT,
                             order_id   BIGINT NOT NULL,
                             menu_id    BIGINT NOT NULL,
@@ -50,7 +48,7 @@ CREATE TABLE order_item (
                             unit_price INT    NOT NULL,
                             PRIMARY KEY (id),
                             CONSTRAINT fk_order_item_order
-                                FOREIGN KEY (order_id) REFERENCES `order` (id),
+                                FOREIGN KEY (order_id) REFERENCES orders (id),
                             CONSTRAINT fk_order_item_menu
-                                FOREIGN KEY (menu_id) REFERENCES menu (id)
+                                FOREIGN KEY (menu_id) REFERENCES menus (id)
 );

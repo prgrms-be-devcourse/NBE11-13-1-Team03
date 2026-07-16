@@ -1,3 +1,39 @@
 spring:
   application:
-    name: coffee-order
+    name: basic-board
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/coffee?useSSL=false&serverTimezone=UTC&characterEncoding=UTF-8&allowPublicKeyRetrieval=true
+    username: root
+    password: ${DB_PASSWORD}
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    # 내부적으로 System.out으로 출력함 => 성능 안좋음
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+
+# logging.level = "어느 패키지의 로그를 어느 레벨부터 보여줄지" 정하는 스위치
+# 패키지별로 다르게 줄 수 있음
+# - root: 모든 로거의 기본값. 스프링 부트 기본이 info라서 보통 그대로 둠
+# - 우리 패키지만 debug로 낮추면, 스프링/하이버네이트 내부 로그는 조용한 채로
+#   우리가 심은 log.debug까지 보임 => 개발할 때 편함
+logging:
+  level:
+    root: info
+    org.example.basicboard: debug
+    # show-sql=true => SQL을 System.out으로 찍음 => 레벨제어, 파일 저장도 불가능, 병목 가능성
+    # 실행되는 문장을 로그로 출력
+    org.hibernate.SQL: debug
+    # SQL의 ? 자리에 바인딩되는 실제 값까지 출력
+    org.hibernate.orm.jdbc.bind: trace
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+
+file:
+  upload-dir: ./uploads
