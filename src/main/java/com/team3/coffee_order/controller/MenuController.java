@@ -1,9 +1,11 @@
 package com.team3.coffee_order.controller;
 
+import com.team3.coffee_order.dto.menu.MenuResponseDto;
+import com.team3.coffee_order.dto.menu.MenuUpdateRequestDto;
 import com.team3.coffee_order.service.MenuService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/menus")
@@ -17,6 +19,13 @@ public class MenuController {
     // TODO: read
 
     // TODO: update
+    @PutMapping("/{menuId}")
+    public ResponseEntity<MenuResponseDto> updateMenu(
+            @PathVariable Long menuId,
+            @RequestBody MenuUpdateRequestDto request
+    ) {
+        return menuService.updateMenu(menuId, request);
+    }
 
     // TODO: delete
 }

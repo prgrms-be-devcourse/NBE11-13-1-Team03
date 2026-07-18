@@ -1,17 +1,19 @@
 package com.team3.coffee_order.domain.entity;
 
 import jakarta.persistence.*;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.SQLRestriction;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.Getter;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 @Entity
-@Table(name = "orders")  // order는 예약어라 테이블명을 orders로 사용
+@Table(name = "orders")
 @SQLDelete(sql = "UPDATE orders SET deleted = true, deleted_at = NOW() WHERE id = ?")
 @SQLRestriction("deleted = false")
+@Getter
 public class Order extends BaseEntity {
 
     @Id
@@ -19,7 +21,7 @@ public class Order extends BaseEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "customer_id생")
+    @JoinColumn(name = "customer_id")
     private Customer customer;
 
     @Column(nullable = false)
@@ -42,4 +44,8 @@ public class Order extends BaseEntity {
     private List<OrderItem> orderItems = new ArrayList<>();
 
     protected Order() {}
+
+    public void updateStatus(OrderStatus status) {
+        this.status = status;
+    }
 }
