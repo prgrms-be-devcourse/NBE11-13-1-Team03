@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -59,5 +60,34 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     Optional<Order> findDetailById(@Param("orderId") Long orderId);
 
 
+    @Query("""
+            SELECT distinct o
+            from Order o
+            join fetch o.customer c
+            left join fetch o.orderItems oi
+            left join fetch oi.menu
+            where o.id = :orderId
+            and c.email = :email
+            """)
+    Optional<Order> findDetailByIdAndCustomerEmail(
+            @Param("orderId") Long orderId,
+            @Param("email") String email
+    );
 
+    // createdAt 시간 범위와 status 조건을 함께 사용해 배송 예정 주문만 조회한다.
+    @Query("""
+            SELECT distinct o
+            from Order o
+            join fetch o.customer c
+            left join fetch o.orderItems oi
+            left join fetch oi.menu
+            where o.createdAt >= :startDateTime
+            and o.createdAt < :endDateTime
+            and o.status = :status
+            """)
+    List<Order> findShippingTargetOrders(
+            @Param("startDateTime") LocalDateTime startDate,
+            @Param("endDateTime") LocalDateTime endDate,
+            @Param("status") OrderStatus status
+    );
 }

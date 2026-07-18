@@ -26,9 +26,13 @@ public class AdminOrderController {
         return ResponseEntity.status(HttpStatus.OK).body(orderService.getOrders(email, status, orderDate, menuName));
     }
 
-
     @GetMapping("/{orderId}")
     public ResponseEntity<OrderGetResponse> getOrderById(@PathVariable Long orderId) {
         return ResponseEntity.status(HttpStatus.OK).body(orderService.getOrderById(orderId));
+    }
+
+    @GetMapping("/shipping-target")
+    public ResponseEntity<List<OrderGetResponse>> getShippingTargetOrders(@RequestParam String date) {
+        return ResponseEntity.status(HttpStatus.OK).body(orderService.getShippingTargetOrders(date));
     }
 }
