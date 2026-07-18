@@ -3,6 +3,7 @@ package com.team3.coffee_order.controller;
 import com.team3.coffee_order.dto.order.OrderStatusResponseDto;
 import com.team3.coffee_order.dto.order.OrderStatusUpdateRequestDto;
 import com.team3.coffee_order.service.OrderService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -26,7 +27,7 @@ public class OrderController {
     @PatchMapping("/{orderId}/status")
     public ResponseEntity<OrderStatusResponseDto> updateOrderStatus(
             @PathVariable Long orderId,
-            @RequestBody OrderStatusUpdateRequestDto request
+            @Valid @RequestBody OrderStatusUpdateRequestDto request
     ) {
         return orderService.updateOrderStatus(orderId, request);
     }

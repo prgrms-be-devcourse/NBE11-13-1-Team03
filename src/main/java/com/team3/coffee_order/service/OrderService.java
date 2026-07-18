@@ -5,12 +5,12 @@ import com.team3.coffee_order.domain.repository.OrderItemRepository;
 import com.team3.coffee_order.domain.repository.OrderRepository;
 import com.team3.coffee_order.dto.order.OrderStatusResponseDto;
 import com.team3.coffee_order.dto.order.OrderStatusUpdateRequestDto;
+import com.team3.coffee_order.exception.OrderNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @RequiredArgsConstructor
@@ -26,15 +26,9 @@ public class OrderService {
     // TODO: update
     @Transactional
     public ResponseEntity<OrderStatusResponseDto> updateOrderStatus(Long orderId, OrderStatusUpdateRequestDto request) {
-        if (request == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Request body is required.");
-        }
-        if (request.getStatus() == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Order status is required.");
-        }
-
+        // 검증된 요청 값으로 주문을 조회하고, 주문 상태만 변경해 결과를 반환한다.
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found."));
+                .orElseThrow(() -> new OrderNotFoundException("주문을 찾을 수 없습니다."));
 
         order.updateStatus(request.getStatus());
 
