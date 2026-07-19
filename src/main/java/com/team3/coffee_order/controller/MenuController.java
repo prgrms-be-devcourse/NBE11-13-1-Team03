@@ -1,8 +1,5 @@
 package com.team3.coffee_order.controller;
 
-import com.team3.coffee_order.domain.entity.Menu;
-import com.team3.coffee_order.domain.repository.MenuRepository;
-import com.team3.coffee_order.dto.MenuRequestDto;
 import com.team3.coffee_order.service.MenuService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -10,8 +7,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/menus")

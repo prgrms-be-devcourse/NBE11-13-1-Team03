@@ -2,10 +2,8 @@ package com.team3.coffee_order.service;
 
 import com.team3.coffee_order.domain.entity.Menu;
 import com.team3.coffee_order.domain.repository.MenuRepository;
-import com.team3.coffee_order.dto.MenuRequestDto;
 import com.team3.coffee_order.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
