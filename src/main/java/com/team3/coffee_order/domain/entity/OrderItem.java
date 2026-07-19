@@ -1,7 +1,9 @@
 package com.team3.coffee_order.domain.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
 
+@Getter
 @Entity
 @Table(name = "order_items")
 public class OrderItem {
