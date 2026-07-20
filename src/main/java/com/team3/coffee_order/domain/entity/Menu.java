@@ -1,10 +1,12 @@
 package com.team3.coffee_order.domain.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 import java.time.LocalDateTime;
 
+@Getter
 @Entity
 @Table(name = "menus")
 @SQLDelete(sql = "UPDATE menus SET deleted = true, deleted_at = NOW() WHERE id = ?")

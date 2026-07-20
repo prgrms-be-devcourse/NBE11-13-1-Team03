@@ -1,4 +1,5 @@
 show tables;
+desc customers;
 -- 1. 고객
 CREATE TABLE customers (
                           id          BIGINT       NOT NULL AUTO_INCREMENT,
