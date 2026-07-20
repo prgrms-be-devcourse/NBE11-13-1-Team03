@@ -2,8 +2,10 @@ package com.team3.coffee_order.domain.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
+import lombok.Getter;
 import java.time.LocalDateTime;
 
+@Getter
 @MappedSuperclass
 public abstract class BaseEntity {
 
@@ -15,9 +17,5 @@ public abstract class BaseEntity {
     public void softDelete() {
         this.deleted = true;
         this.deletedAt = LocalDateTime.now();
-    }
-
-    public boolean isDeleted() {
-        return deleted;
     }
 }
