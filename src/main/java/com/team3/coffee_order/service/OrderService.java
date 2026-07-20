@@ -1,15 +1,16 @@
 package com.team3.coffee_order.service;
 
 import com.team3.coffee_order.domain.entity.*;
+import com.team3.coffee_order.domain.repository.OrderItemMenuInfoProjection;
 import com.team3.coffee_order.domain.repository.OrderItemRepository;
 import com.team3.coffee_order.domain.repository.OrderRepository;
 import com.team3.coffee_order.dto.OrderCreateRequest;
 import com.team3.coffee_order.dto.OrderCreateResponse;
 import com.team3.coffee_order.dto.OrderItemRequest;
 import com.team3.coffee_order.dto.OrderItemResponse;
+import com.team3.coffee_order.dto.order.OrderGetResponse;
 import com.team3.coffee_order.dto.order.OrderStatusResponseDto;
 import com.team3.coffee_order.dto.order.OrderStatusUpdateRequestDto;
-import com.team3.coffee_order.dto.order.OrderGetResponse;
 import com.team3.coffee_order.exception.*;
 import com.team3.coffee_order.mapper.OrderMapper;
 import lombok.RequiredArgsConstructor;
@@ -17,13 +18,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.DeleteMapping;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
