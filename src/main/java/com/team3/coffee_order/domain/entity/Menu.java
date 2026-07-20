@@ -6,6 +6,7 @@ import lombok.Getter;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
+@Getter
 @Entity
 @Table(name = "menus")
 @Getter

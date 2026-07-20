@@ -5,6 +5,7 @@ import com.team3.coffee_order.domain.repository.MenuRepository;
 import com.team3.coffee_order.dto.menu.MenuResponseDto;
 import com.team3.coffee_order.dto.menu.MenuUpdateRequestDto;
 import com.team3.coffee_order.exception.MenuNotFoundException;
+import com.team3.coffee_order.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,4 +37,12 @@ public class MenuService {
     }
 
     // TODO: delete
+}
+    public ResponseEntity<Void> deleteMenu(Long id){
+        Menu menu = menuRepository.findById(id)
+                .orElseThrow(()->  new NotFoundException("해당하는 메뉴를 찾을 수 없습니다. id = "+id));
+
+        menuRepository.delete(menu);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
 }

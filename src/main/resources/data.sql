@@ -5,6 +5,7 @@ CREATE DATABASE coffee_order
 USE coffee_order;
 
 show tables;
+desc customers;
 -- 1. 고객
 CREATE TABLE customers (
                           id          BIGINT       NOT NULL AUTO_INCREMENT,
