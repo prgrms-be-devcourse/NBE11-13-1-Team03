@@ -1,3 +1,5 @@
+create database coffee;
+use coffee;
 show tables;
 -- 1. 고객
 CREATE TABLE customers (
