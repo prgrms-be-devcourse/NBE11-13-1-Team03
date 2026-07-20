@@ -4,15 +4,12 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.Getter;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.SQLRestriction;
 
-@Getter
 @Entity
 @Getter
 @Table(name = "orders")
@@ -61,7 +58,7 @@ public class Order extends BaseEntity {
     public void addOrderItem(OrderItem item) {
         this.orderItems.add(item);
     }
-}
+
     public void updateStatus(OrderStatus status) {
         this.status = status;
     }

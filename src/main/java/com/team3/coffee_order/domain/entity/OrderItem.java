@@ -3,7 +3,6 @@ package com.team3.coffee_order.domain.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 
-@Getter
 @Entity
 @Getter
 @Table(name = "order_items")
