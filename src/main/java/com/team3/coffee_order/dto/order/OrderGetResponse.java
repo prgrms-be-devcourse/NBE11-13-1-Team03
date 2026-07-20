@@ -1,5 +1,6 @@
-package com.team3.coffee_order.dto;
+package com.team3.coffee_order.dto.order;
 
+import com.team3.coffee_order.dto.orderItem.OrderItemGetResponse;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

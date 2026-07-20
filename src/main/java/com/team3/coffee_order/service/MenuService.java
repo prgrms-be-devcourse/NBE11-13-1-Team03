@@ -2,24 +2,20 @@ package com.team3.coffee_order.service;
 
 import com.team3.coffee_order.domain.entity.Menu;
 import com.team3.coffee_order.domain.repository.MenuRepository;
-import com.team3.coffee_order.dto.MenuGetResponse;
-import com.team3.coffee_order.exception.MenuNotFoundException;
-import com.team3.coffee_order.mapper.MenuMapper;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
+import com.team3.coffee_order.dto.menu.MenuGetResponse;
 import com.team3.coffee_order.dto.menu.MenuResponseDto;
 import com.team3.coffee_order.dto.menu.MenuUpdateRequestDto;
 import com.team3.coffee_order.exception.MenuNotFoundException;
 import com.team3.coffee_order.exception.NotFoundException;
+import com.team3.coffee_order.mapper.MenuMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -32,6 +28,7 @@ public class MenuService {
     // TODO: create
 
     // TODO: read
+    // 응답 순서를 고정하기 위해 id 오름차순으로 조회한다.
     public List<MenuGetResponse> getMenus() {
         return menuRepository.findAll(Sort.by(Sort.Direction.ASC, "id"))
                 .stream()

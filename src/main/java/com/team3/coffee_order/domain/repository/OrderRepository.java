@@ -17,55 +17,42 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             SELECT distinct o from Order o
             join fetch o.customer c
             left join fetch o.orderItems oi
-            left join fetch oi.menu
             where c.email = :email
             """)
     List<Order> findAllByCustomerEmail(@Param("email") String email);
 
     // 관리자 주문 조회용 쿼리.
-    // customer, orderItems, menu를 fetch join으로 함께 조회해 N+1 문제를 줄인다.
-    // menuName은 exists 서브쿼리로 검사해서, 특정 메뉴로 필터링해도 주문의 전체 items와 totalPrice는 유지되도록 한다.
+    // customer와 orderItems를 fetch join으로 함께 조회해 주문 응답 생성 시 N+1 문제를 줄인다.
+    // menuName 조건은 service에서 삭제된 메뉴까지 포함한 orderIds로 먼저 변환하고, repository에서는 해당 주문 id 목록만 조건으로 사용한다.
     @Query("""
             SELECT distinct o from Order o
             join fetch o.customer c
             left join fetch o.orderItems oi
-            left join fetch oi.menu
             where (:email is null or c.email = :email)
             and (:status is null or o.status = :status)
             and (:orderDate is null or o.orderDate = :orderDate)
-            and (
-                    :menuName is null or exists (
-                        select 1
-                        from OrderItem oi2
-                        join oi2.menu m2
-                        where oi2.order = o
-                        and m2.name = :menuName
-                    )
-                )
+            and (:useOrderIds = false  or o.id in :orderIds)
             """)
     List<Order> searchOrders(
             @Param("email") String email,
             @Param("status") OrderStatus status,
             @Param("orderDate") LocalDate orderDate,
-            @Param("menuName") String menuName
+            @Param("useOrderIds") boolean useOrderIds,
+            @Param("orderIds") List<Long> orderIds
     );
 
     @Query("""
             SELECT distinct o from Order o
             join fetch o.customer c
             left join fetch o.orderItems oi
-            left join fetch oi.menu
             where o.id = :orderId
             """)
     Optional<Order> findDetailById(@Param("orderId") Long orderId);
 
-
     @Query("""
-            SELECT distinct o
-            from Order o
+            SELECT distinct o from Order o
             join fetch o.customer c
             left join fetch o.orderItems oi
-            left join fetch oi.menu
             where o.id = :orderId
             and c.email = :email
             """)
@@ -76,11 +63,9 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     // createdAt 시간 범위와 status 조건을 함께 사용해 배송 예정 주문만 조회한다.
     @Query("""
-            SELECT distinct o
-            from Order o
+            SELECT distinct o from Order o
             join fetch o.customer c
             left join fetch o.orderItems oi
-            left join fetch oi.menu
             where o.createdAt >= :startDateTime
             and o.createdAt < :endDateTime
             and o.status = :status
