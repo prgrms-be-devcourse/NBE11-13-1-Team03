@@ -8,12 +8,16 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.Getter;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 @Getter
 @Entity
-@Table(name = "orders")  // order는 예약어라 테이블명을 orders로 사용
+@Table(name = "orders")
 @SQLDelete(sql = "UPDATE orders SET deleted = true, deleted_at = NOW() WHERE id = ?")
 @SQLRestriction("deleted = false")
+@Getter
 public class Order extends BaseEntity {
 
     @Id
@@ -44,4 +48,8 @@ public class Order extends BaseEntity {
     private List<OrderItem> orderItems = new ArrayList<>();
 
     protected Order() {}
+
+    public void updateStatus(OrderStatus status) {
+        this.status = status;
+    }
 }
