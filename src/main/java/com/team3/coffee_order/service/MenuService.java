@@ -3,23 +3,19 @@ package com.team3.coffee_order.service;
 import com.team3.coffee_order.domain.entity.Menu;
 import com.team3.coffee_order.domain.repository.MenuRepository;
 import com.team3.coffee_order.dto.MenuGetResponse;
-import com.team3.coffee_order.exception.MenuNotFoundException;
-import com.team3.coffee_order.mapper.MenuMapper;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 import com.team3.coffee_order.dto.menu.MenuResponseDto;
 import com.team3.coffee_order.dto.menu.MenuUpdateRequestDto;
 import com.team3.coffee_order.exception.MenuNotFoundException;
 import com.team3.coffee_order.exception.NotFoundException;
+import com.team3.coffee_order.mapper.MenuMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +26,10 @@ public class MenuService {
     private final MenuMapper menuMapper;
 
     // TODO: create
+    public Menu getMenuEntityById(Long id) {
+        return menuRepository.findById(id)
+                .orElseThrow(() -> new MenuNotFoundException("메뉴를 찾을 수 없습니다."));
+    }
 
     // TODO: read
     public List<MenuGetResponse> getMenus() {

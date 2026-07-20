@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
@@ -20,14 +21,13 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
-                .body(
-                        new ErrorResponseDto(HttpStatus.NOT_FOUND.value(), e.getMessage())
-                );
+                .body(new ErrorResponseDto(HttpStatus.NOT_FOUND.value(), e.getMessage()));
     }
 
     // updateStatusException
-    @ExceptionHandler(InvalidOrderStatusException.class)
-    public ResponseEntity<ErrorResponseDto> invalidOrderStatusException(InvalidOrderStatusException e){
+    @ExceptionHandler(InvalidOrderStatusTransitionException.class)
+    public ResponseEntity<ErrorResponseDto> invalidOrderStatusTransitionException(InvalidOrderStatusTransitionException e
+) {
         log.warn("409 응답(잘못된 주문 상태 변경): {}",e.getMessage());
 
         return ResponseEntity
@@ -45,6 +45,55 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
                 .body(new ErrorResponseDto(HttpStatus.NOT_FOUND.value(), e.getMessage()));
+    }
+
+    @ExceptionHandler(InvalidEmailException.class)
+    public ResponseEntity<ErrorResponseDto> invalidEmailException(InvalidEmailException e) {
+        log.warn("400 응답(잘못된 이메일 요청): {}", e.getMessage());
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponseDto(HttpStatus.BAD_REQUEST.value(), e.getMessage()));
+    }
+
+    @ExceptionHandler(InvalidOrderStatusException.class)
+    public ResponseEntity<ErrorResponseDto> invalidOrderStatusException(InvalidOrderStatusException  e) {
+        log.warn("400 응답(잘못된 주문 상태): {}", e.getMessage());
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponseDto(HttpStatus.BAD_REQUEST.value(), e.getMessage()));
+    }
+
+    @ExceptionHandler(InvalidOrderDateException.class)
+    public ResponseEntity<ErrorResponseDto> invalidOrderDateException(InvalidOrderDateException e) {
+        log.warn("400 응답(잘못된 주문 날짜): {}", e.getMessage());
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponseDto(HttpStatus.BAD_REQUEST.value(), e.getMessage()));
+    }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<ErrorResponseDto> missingRequestParameterException(MissingServletRequestParameterException e) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponseDto(HttpStatus.BAD_REQUEST.value(), "필수 요청 파라미터가 없습니다. " + e.getParameterName()));
+    }
+
+    // 경로 변수/요청 파라미터 타입 변환 실패 시 400 응답 처리
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ErrorResponseDto> methodArgumentTypeMismatchException(MethodArgumentTypeMismatchException e) {
+        log.warn("400 응답(잘못된 타입): name={}, value={}", e.getName(), e.getValue());
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(
+                        new ErrorResponseDto(
+                                HttpStatus.BAD_REQUEST.value(),
+                                "요청 값의 타입이 올바르지 않습니다. " + e.getName() + "=" + e.getValue()
+                        )
+                );
     }
 
     // 요청 값/본문/타입 오류는 500 핸들러로 넘어가지 않도록 400 응답으로 분리
@@ -71,19 +120,7 @@ public class GlobalExceptionHandler {
                 .body(new ErrorResponseDto(HttpStatus.BAD_REQUEST.value(), "요청 본문이 올바르지 않습니다."));
     }
 
-    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public ResponseEntity<ErrorResponseDto> methodArgumentTypeMismatchException(MethodArgumentTypeMismatchException e) {
-        log.warn("400 응답(잘못된 타입): name={}, value={}", e.getName(), e.getValue());
 
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(
-                        new ErrorResponseDto(
-                                HttpStatus.BAD_REQUEST.value(),
-                                "요청 값의 타입이 올바르지 않습니다. " + e.getName() + "=" + e.getValue()
-                        )
-                );
-    }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponseDto> exception(Exception e) {
