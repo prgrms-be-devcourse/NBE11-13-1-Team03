@@ -7,9 +7,9 @@ import com.team3.coffee_order.dto.OrderCreateRequest;
 import com.team3.coffee_order.dto.OrderCreateResponse;
 import com.team3.coffee_order.dto.OrderItemRequest;
 import com.team3.coffee_order.dto.OrderItemResponse;
-import com.team3.coffee_order.dto.OrderGetResponse;
 import com.team3.coffee_order.dto.order.OrderStatusResponseDto;
 import com.team3.coffee_order.dto.order.OrderStatusUpdateRequestDto;
+import com.team3.coffee_order.dto.order.OrderGetResponse;
 import com.team3.coffee_order.exception.*;
 import com.team3.coffee_order.mapper.OrderMapper;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +31,9 @@ import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -98,18 +101,24 @@ public class OrderService {
     @Transactional(readOnly = true)
     public List<OrderGetResponse> getOrderByEmail(String email) {
         if (email == null || email.isBlank()) {
-            throw new InvalidEmailException();
+            throw new InvalidEmailException("이메일은 비어 있을 수 없습니다.");
         }
 
         String trimmedEmail = email.trim();
 
-        return orderRepository.findAllByCustomerEmail(trimmedEmail).stream()
+        List<Order> orders = orderRepository.findAllByCustomerEmail(trimmedEmail).stream()
                 .sorted(Comparator.comparing(Order::getId).reversed())
-                .map(orderMapper::toOrderGetResponse)
+                .toList();
+
+        Map<Long, OrderItemMenuInfoProjection> menuInfoMap = getMenuInfoMap(orders);
+
+        return orders.stream()
+                .map(order -> orderMapper.toOrderGetResponse(order, menuInfoMap))
                 .toList();
     }
 
-    // 문자열 조건은 trim 후 null로 정리하고, status/date는 타입 변환 후 repository에 전달한다.
+    // 문자열 조건은 trim 후 null로 정리하고, status/date는 타입 변환한다.
+    // menuName이 있으면 삭제된 메뉴도 검색할 수 있도록 먼저 주문 id 목록을 구한 뒤 주문을 조회한다.
     @Transactional(readOnly = true)
     public List<OrderGetResponse> getOrders(String email, String status, String orderDate, String menuName) {
         String trimmedEmail = (email == null || email.isBlank()) ? null : email.trim();
@@ -118,9 +127,29 @@ public class OrderService {
         OrderStatus parseOrderStatus = parseOrderStatus(status);
         LocalDate parsedOrderDate = parseOrderDate(orderDate);
 
-        return orderRepository.searchOrders(trimmedEmail, parseOrderStatus, parsedOrderDate, trimmedMenuName).stream()
+        // menuName 필터가 있을 때만 주문 id 목록 조건을 사용한다.
+        // 기본값 -1L은 빈 IN() 조건으로 인한 쿼리 오류를 피하기 위한 안전장치다.
+        boolean useOrderIds = false;
+        List<Long> orderIds = List.of(-1L);
+
+        if (trimmedMenuName != null) {
+            orderIds = orderItemRepository.findOrderIdsByMenuNameIncludingDeleted(trimmedMenuName);
+
+            if (orderIds.isEmpty()) {
+                return List.of();
+            }
+
+            useOrderIds = true;
+        }
+
+        List<Order> orders = orderRepository.searchOrders(trimmedEmail, parseOrderStatus, parsedOrderDate, useOrderIds, orderIds).stream()
                 .sorted(Comparator.comparing(Order::getId).reversed())
-                .map(orderMapper::toOrderGetResponse)
+                .toList();
+
+        Map<Long, OrderItemMenuInfoProjection> menuInfoMap = getMenuInfoMap(orders);
+
+        return orders.stream()
+                .map(order -> orderMapper.toOrderGetResponse(order, menuInfoMap))
                 .toList();
     }
 
@@ -129,14 +158,16 @@ public class OrderService {
         Order order = orderRepository.findDetailById(orderId)
                 .orElseThrow(() -> new OrderNotFoundException("해당하는 주문이 존재하지 않습니다. id = "+orderId));
 
-        return orderMapper.toOrderGetResponse(order);
+        Map<Long, OrderItemMenuInfoProjection> menuInfoMap = getMenuInfoMap(List.of(order));
+
+        return orderMapper.toOrderGetResponse(order, menuInfoMap);
     }
 
     // 고객 주문 단건 조회는 email과 orderId가 모두 일치하는 경우만 반환해 다른 고객의 주문이 노출되지 않도록 한다.
     @Transactional(readOnly = true)
     public OrderGetResponse getOrderByIdAndEmail(Long orderId, String email) {
         if (email == null || email.isBlank()) {
-            throw new InvalidEmailException();
+            throw new InvalidEmailException("이메일은 비어 있을 수 없습니다.");
         }
 
         String trimmedEmail = email.trim();
@@ -144,7 +175,9 @@ public class OrderService {
         Order order = orderRepository.findDetailByIdAndCustomerEmail(orderId, trimmedEmail)
                 .orElseThrow(() -> new OrderNotFoundException("해당하는 주문이 존재하지 않습니다. id = "+orderId));
 
-        return orderMapper.toOrderGetResponse(order);
+        Map<Long, OrderItemMenuInfoProjection> menuInfoMap = getMenuInfoMap(List.of(order));
+
+        return orderMapper.toOrderGetResponse(order, menuInfoMap);
     }
 
     // 배송 대상 주문은 조회 기준일의 전날 14:00 이상, 당일 14:00 미만에 생성된 주문만 조회한다.
@@ -152,7 +185,7 @@ public class OrderService {
     @Transactional(readOnly = true)
     public List<OrderGetResponse> getShippingTargetOrders(String date) {
         if (date == null || date.isBlank()) {
-            throw new InvalidOrderDateException(date);
+            throw new InvalidOrderDateException("날짜 형식이 올바르지 않습니다 (yyyy-MM-dd). orderDate=" + date);
         }
 
         LocalDate shippingDate = parseOrderDate(date);
@@ -160,9 +193,14 @@ public class OrderService {
         LocalDateTime startDate = shippingDate.minusDays(1).atTime(14, 0);
         LocalDateTime endDate = shippingDate.atTime(14, 0);
 
-        return orderRepository.findShippingTargetOrders(startDate, endDate, OrderStatus.ORDERED).stream()
+        List<Order> orders = orderRepository.findShippingTargetOrders(startDate, endDate, OrderStatus.ORDERED).stream()
                 .sorted(Comparator.comparing(Order::getCreatedAt))
-                .map(orderMapper::toOrderGetResponse)
+                .toList();
+
+        Map<Long, OrderItemMenuInfoProjection> menuInfoMap = getMenuInfoMap(orders);
+
+        return orders.stream()
+                .map(order -> orderMapper.toOrderGetResponse(order, menuInfoMap))
                 .toList();
     }
 
@@ -175,7 +213,7 @@ public class OrderService {
         try {
             return OrderStatus.valueOf(status.trim().toUpperCase());
         } catch (IllegalArgumentException e) {
-            throw new InvalidOrderStatusException(status);
+            throw new InvalidOrderStatusException("잘못된 주문 상태입니다. status=" + status);
         }
     }
 
@@ -188,8 +226,27 @@ public class OrderService {
         try {
             return LocalDate.parse(orderDate.trim());
         } catch (DateTimeParseException e) {
-            throw new InvalidOrderDateException(orderDate);
+            throw new InvalidOrderDateException("날짜 형식이 올바르지 않습니다 (yyyy-MM-dd). orderDate=" + orderDate);
         }
+    }
+
+    // 주문 응답에서는 메뉴 엔티티를 직접 참조하지 않으므로,
+    // 조회된 모든 orderItemId 기준으로 메뉴 id/이름을 Map 형태로 만든다.
+    private Map<Long, OrderItemMenuInfoProjection> getMenuInfoMap(List<Order> orders) {
+        List<Long> orderItemIds = orders.stream()
+                .flatMap(order -> order.getOrderItems().stream())
+                .map(OrderItem::getId)
+                .toList();
+
+        if (orderItemIds.isEmpty()) {
+            return Map.of();
+        }
+
+        return orderItemRepository.findMenuInfosByOrderItemIds(orderItemIds).stream()
+                .collect(Collectors.toMap(
+                        OrderItemMenuInfoProjection::getOrderItemId,
+                        Function.identity()
+                ));
     }
 
 
