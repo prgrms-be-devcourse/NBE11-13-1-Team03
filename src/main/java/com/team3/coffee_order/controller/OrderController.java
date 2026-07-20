@@ -6,8 +6,8 @@ import com.team3.coffee_order.dto.order.OrderStatusUpdateRequestDto;
 import com.team3.coffee_order.service.OrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,6 +20,14 @@ public class OrderController {
     private final OrderService orderService;
 
     // TODO: create
+    @PostMapping
+    public ResponseEntity<OrderCreateResponse> createOrder(
+            @Valid
+            @RequestBody
+            OrderCreateRequest request
+    ) {
+        return orderService.create(request);
+    }
 
     // TODO: read
     @GetMapping
@@ -46,6 +54,7 @@ public class OrderController {
     }
 
     // TODO: delete
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteOrder(@PathVariable Long id){
         return orderService.deleteOrder(id);

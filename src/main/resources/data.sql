@@ -2,7 +2,7 @@ CREATE DATABASE coffee_order
     DEFAULT CHARACTER SET utf8mb4
     COLLATE utf8mb4_unicode_ci;
 
-USE coffee_order;
+USE coffee;
 
 show tables;
 desc customers;
@@ -59,3 +59,37 @@ CREATE TABLE order_items (
                             CONSTRAINT fk_order_item_menu
                                 FOREIGN KEY (menu_id) REFERENCES menus (id)
 );
+
+
+
+
+
+# Test
+INSERT INTO customers (
+    email,
+    created_at,
+    deleted
+) VALUES (
+             'test2@example.com',
+             NOW(),
+             FALSE
+         );
+INSERT INTO orders (
+    customer_id,
+    order_date,
+    status,
+    address,
+    zip_code,
+    created_at,
+    deleted
+) VALUES (
+             2,
+             CURDATE(),
+             'ORDERED',
+             '서울시 강남구',
+             '12345',
+             NOW(),
+             FALSE
+         );
+
+SELECT * FROM orders;

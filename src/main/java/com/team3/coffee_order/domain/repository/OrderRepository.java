@@ -1,5 +1,6 @@
 package com.team3.coffee_order.domain.repository;
 
+import com.team3.coffee_order.domain.entity.Customer;
 import com.team3.coffee_order.domain.entity.Order;
 import com.team3.coffee_order.domain.entity.OrderStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,8 +12,13 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import java.time.LocalDate;
+import java.util.Optional;
+
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
+    Optional<Order> findByCustomerAndOrderDate(Customer customer, LocalDate orderDate);
+  
     @Query("""
             SELECT distinct o from Order o
             join fetch o.customer c
