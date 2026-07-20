@@ -1,4 +1,11 @@
+CREATE DATABASE coffee_order
+    DEFAULT CHARACTER SET utf8mb4
+    COLLATE utf8mb4_unicode_ci;
+
+USE coffee_order;
+
 show tables;
+desc customers;
 -- 1. 고객
 CREATE TABLE customers (
                           id          BIGINT       NOT NULL AUTO_INCREMENT,
