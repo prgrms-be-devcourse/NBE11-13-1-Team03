@@ -14,6 +14,7 @@ import org.hibernate.annotations.SQLRestriction;
 
 @Getter
 @Entity
+@Getter
 @Table(name = "orders")
 @SQLDelete(sql = "UPDATE orders SET deleted = true, deleted_at = NOW() WHERE id = ?")
 @SQLRestriction("deleted = false")
@@ -48,6 +49,19 @@ public class Order extends BaseEntity {
 
     protected Order() {}
 
+    public Order(Customer customer, LocalDate orderDate, OrderStatus status, String address, String zipCode) {
+        this.customer = customer;
+        this.orderDate = orderDate;
+        this.status = status;
+        this.address = address;
+        this.zipCode = zipCode;
+        this.createdAt = LocalDateTime.now();
+    }
+
+    public void addOrderItem(OrderItem item) {
+        this.orderItems.add(item);
+    }
+}
     public void updateStatus(OrderStatus status) {
         this.status = status;
     }

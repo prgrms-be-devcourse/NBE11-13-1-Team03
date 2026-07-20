@@ -30,6 +30,10 @@ public class MenuService {
     private final MenuMapper menuMapper;
 
     // TODO: create
+    public Menu getMenuEntityById(Long id) {
+        return menuRepository.findById(id)
+                .orElseThrow(new MenuNotFoundException("메뉴를 찾을 수 없습니다."));
+    }
 
     // TODO: read
     public List<MenuGetResponse> getMenus() {
