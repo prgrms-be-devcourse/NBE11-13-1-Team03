@@ -23,7 +23,11 @@ public class OrderController {
 
     // TODO: create
     @PostMapping
-    public ResponseEntity<OrderCreateResponse> createOrder(@RequestBody OrderCreateRequest request) {
+    public ResponseEntity<OrderCreateResponse> createOrder(
+            @Valid
+            @RequestBody
+            OrderCreateRequest request
+    ) {
         return orderService.create(request);
     }
 
