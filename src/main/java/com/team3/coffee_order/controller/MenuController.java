@@ -50,7 +50,6 @@ public class MenuController {
     }
 
     // TODO: delete
-}
     @Operation(summary = "메뉴 삭제", description = "id로 메뉴를 삭제한다")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "메뉴 삭제 성공"),

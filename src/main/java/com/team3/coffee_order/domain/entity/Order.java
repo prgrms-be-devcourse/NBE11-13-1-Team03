@@ -17,7 +17,6 @@ import org.hibernate.annotations.SQLRestriction;
 @Table(name = "orders")
 @SQLDelete(sql = "UPDATE orders SET deleted = true, deleted_at = NOW() WHERE id = ?")
 @SQLRestriction("deleted = false")
-@Getter
 public class Order extends BaseEntity {
 
     @Id

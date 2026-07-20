@@ -46,7 +46,6 @@ public class OrderService {
     }
 
     // TODO: delete
-}
     public ResponseEntity<Void> deleteOrder(Long id){
         Order order = orderRepository.findById(id)
                 .orElseThrow(()->new NotFoundException("해당하는 주문을 찾을 수 없습니다. id = "+id));
