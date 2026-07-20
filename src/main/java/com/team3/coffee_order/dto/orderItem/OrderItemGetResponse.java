@@ -1,4 +1,4 @@
-package com.team3.coffee_order.dto;
+package com.team3.coffee_order.dto.orderItem;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

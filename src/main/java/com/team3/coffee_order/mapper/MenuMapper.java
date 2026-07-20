@@ -1,7 +1,7 @@
 package com.team3.coffee_order.mapper;
 
 import com.team3.coffee_order.domain.entity.Menu;
-import com.team3.coffee_order.dto.MenuGetResponse;
+import com.team3.coffee_order.dto.menu.MenuGetResponse;
 import org.springframework.stereotype.Component;
 
 @Component

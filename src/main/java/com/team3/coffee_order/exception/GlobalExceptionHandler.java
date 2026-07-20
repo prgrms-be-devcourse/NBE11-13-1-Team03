@@ -24,6 +24,20 @@ public class GlobalExceptionHandler {
                 .body(new ErrorResponseDto(HttpStatus.NOT_FOUND.value(), e.getMessage()));
     }
 
+    // updateStatusException
+    @ExceptionHandler(InvalidOrderStatusTransitionException.class)
+    public ResponseEntity<ErrorResponseDto> invalidOrderStatusTransitionException(InvalidOrderStatusTransitionException e
+) {
+        log.warn("409 응답(잘못된 주문 상태 변경): {}",e.getMessage());
+
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(new ErrorResponseDto(HttpStatus.CONFLICT.value(), e.getMessage())
+                );
+    }
+
+    //* 최후의 보루 핸들러 : 위에서 처리하지 못한 나머지 "모든 예외"를 잡는다
+    //예상 못한 예외에 대해서 안전망 역할 수행
     @ExceptionHandler(OrderNotFoundException.class)
     public ResponseEntity<ErrorResponseDto> orderNotFoundException(OrderNotFoundException e) {
         log.warn("404 응답(주문 없음) : {}", e.getMessage());
@@ -124,7 +138,6 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(new ErrorResponseDto(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Internal server error."));
     }
-
     //NotFoundException 처리
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<ErrorResponseDto> handleNotFoundException(NotFoundException e){

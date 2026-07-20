@@ -3,7 +3,7 @@ package com.team3.coffee_order.service;
 import com.team3.coffee_order.domain.entity.Menu;
 import com.team3.coffee_order.domain.repository.MenuRepository;
 import com.team3.coffee_order.dto.MenuCreateRequest;
-import com.team3.coffee_order.dto.MenuGetResponse;
+import com.team3.coffee_order.dto.menu.MenuGetResponse;
 import com.team3.coffee_order.dto.menu.MenuResponseDto;
 import com.team3.coffee_order.dto.menu.MenuUpdateRequestDto;
 import com.team3.coffee_order.exception.DuplicateMenuNameException;
@@ -47,6 +47,7 @@ public class MenuService {
     }
 
     // TODO: read
+    // 응답 순서를 고정하기 위해 id 오름차순으로 조회한다.
     public List<MenuGetResponse> getMenus() {
         return menuRepository.findAll(Sort.by(Sort.Direction.ASC, "id"))
                 .stream()

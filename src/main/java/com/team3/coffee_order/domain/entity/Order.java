@@ -1,10 +1,11 @@
 package com.team3.coffee_order.domain.entity;
 
+import com.team3.coffee_order.exception.InvalidOrderStatusException;
 import jakarta.persistence.*;
 import lombok.Getter;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
-
+import com.team3.coffee_order.exception.InvalidOrderStatusTransitionException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -44,9 +45,16 @@ public class Order extends BaseEntity {
     @OneToMany(mappedBy = "order")
     private List<OrderItem> orderItems = new ArrayList<>();
 
-    protected Order() {}
+    protected Order() {
+    }
 
-    public Order(Customer customer, LocalDate orderDate, OrderStatus status, String address, String zipCode) {
+    public Order(
+            Customer customer,
+            LocalDate orderDate,
+            OrderStatus status,
+            String address,
+            String zipCode
+    ) {
         this.customer = customer;
         this.orderDate = orderDate;
         this.status = status;
@@ -59,7 +67,18 @@ public class Order extends BaseEntity {
         this.orderItems.add(item);
     }
 
-    public void updateStatus(OrderStatus status) {
-        this.status = status;
+    // 호출 경로와 관계없이 동일한 주문 상태 변경 규칙을 보장하기 위해 엔티티 내부에서 검증
+    public void updateStatus(OrderStatus nextStatus) {
+        if (nextStatus == null) {
+            throw new InvalidOrderStatusTransitionException("변경할 수 없습니다.");
+        }
+
+        if (!status.canChangeTo(nextStatus)) {
+            throw new InvalidOrderStatusTransitionException(
+                status + "에서 " + nextStatus + "로 변경할 수 없습니다."
+            );
+        }
+
+        this.status = nextStatus;
     }
 }
