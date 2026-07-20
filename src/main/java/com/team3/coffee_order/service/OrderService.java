@@ -1,23 +1,31 @@
 package com.team3.coffee_order.service;
 
 import com.team3.coffee_order.domain.entity.Order;
+import com.team3.coffee_order.domain.entity.OrderStatus;
 import com.team3.coffee_order.domain.repository.OrderItemRepository;
 import com.team3.coffee_order.domain.repository.OrderRepository;
+import com.team3.coffee_order.dto.OrderGetResponse;
 import com.team3.coffee_order.dto.order.OrderStatusResponseDto;
 import com.team3.coffee_order.dto.order.OrderStatusUpdateRequestDto;
-import com.team3.coffee_order.exception.OrderNotFoundException;
+import com.team3.coffee_order.exception.*;
+import com.team3.coffee_order.mapper.OrderMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.team3.coffee_order.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.DeleteMapping;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
+import java.util.Comparator;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -63,7 +71,7 @@ public class OrderService {
     @Transactional(readOnly = true)
     public OrderGetResponse getOrderById(Long orderId) {
         Order order = orderRepository.findDetailById(orderId)
-                .orElseThrow(() -> new OrderNotFoundException(orderId));
+                .orElseThrow(() -> new OrderNotFoundException("해당하는 주문이 존재하지 않습니다. id = "+orderId));
 
         return orderMapper.toOrderGetResponse(order);
     }
@@ -78,7 +86,7 @@ public class OrderService {
         String trimmedEmail = email.trim();
 
         Order order = orderRepository.findDetailByIdAndCustomerEmail(orderId, trimmedEmail)
-                .orElseThrow(() -> new OrderNotFoundException(orderId));
+                .orElseThrow(() -> new OrderNotFoundException("해당하는 주문이 존재하지 않습니다. id = "+orderId));
 
         return orderMapper.toOrderGetResponse(order);
     }
