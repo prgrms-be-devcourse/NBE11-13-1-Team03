@@ -1,5 +1,6 @@
 package com.team3.coffee_order.controller;
 
+import com.team3.coffee_order.dto.MenuCreateRequest;
 import com.team3.coffee_order.dto.MenuGetResponse;
 import com.team3.coffee_order.dto.menu.MenuResponseDto;
 import com.team3.coffee_order.dto.menu.MenuUpdateRequestDto;
@@ -15,7 +16,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,6 +28,16 @@ public class MenuController {
     private final MenuService menuService;
 
     // TODO: create
+    @PostMapping
+    public ResponseEntity<MenuResponseDto> createMenu(
+            @Valid
+            @RequestBody
+            MenuCreateRequest request
+            ) {
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(menuService.create(request));
+    }
 
     // TODO: read
     @GetMapping

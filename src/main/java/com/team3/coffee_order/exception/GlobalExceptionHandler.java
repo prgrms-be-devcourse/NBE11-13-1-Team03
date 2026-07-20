@@ -106,6 +106,14 @@ public class GlobalExceptionHandler {
                 .body(new ErrorResponseDto(HttpStatus.BAD_REQUEST.value(), "요청 본문이 올바르지 않습니다."));
     }
 
+    @ExceptionHandler(DuplicateMenuNameException.class)
+    public ResponseEntity<ErrorResponseDto> duplicateMenuNameException(DuplicateMenuNameException e) {
+        log.warn("409 응답(이미 존재하는 메뉴 추가 요청): {}", e.getMessage());
+
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(new ErrorResponseDto(HttpStatus.CONFLICT.value(), e.getMessage()));
+    }
 
 
     @ExceptionHandler(Exception.class)

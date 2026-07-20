@@ -2,9 +2,11 @@ package com.team3.coffee_order.service;
 
 import com.team3.coffee_order.domain.entity.Menu;
 import com.team3.coffee_order.domain.repository.MenuRepository;
+import com.team3.coffee_order.dto.MenuCreateRequest;
 import com.team3.coffee_order.dto.MenuGetResponse;
 import com.team3.coffee_order.dto.menu.MenuResponseDto;
 import com.team3.coffee_order.dto.menu.MenuUpdateRequestDto;
+import com.team3.coffee_order.exception.DuplicateMenuNameException;
 import com.team3.coffee_order.exception.MenuNotFoundException;
 import com.team3.coffee_order.exception.NotFoundException;
 import com.team3.coffee_order.mapper.MenuMapper;
@@ -29,6 +31,19 @@ public class MenuService {
     public Menu getMenuEntityById(Long id) {
         return menuRepository.findById(id)
                 .orElseThrow(() -> new MenuNotFoundException("메뉴를 찾을 수 없습니다."));
+    }
+
+    @Transactional
+    public MenuResponseDto create(MenuCreateRequest request) {
+        if (menuRepository.existsByName(request.getName()))
+            throw new DuplicateMenuNameException("이미 존재하는 메뉴입니다.");
+
+        String description = (request.getDescription() == null || request.getDescription().isBlank())
+                ? null
+                : request.getDescription();
+        Menu menu = new Menu(request.getName(), request.getPrice(), description);
+
+        return new MenuResponseDto(menuRepository.save(menu));
     }
 
     // TODO: read
