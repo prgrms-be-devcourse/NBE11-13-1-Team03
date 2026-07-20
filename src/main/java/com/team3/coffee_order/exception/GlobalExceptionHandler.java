@@ -20,9 +20,13 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
-                .body(new ErrorResponseDto(HttpStatus.NOT_FOUND.value(), e.getMessage()));
+                .body(
+                        new ErrorResponseDto(HttpStatus.NOT_FOUND.value(), e.getMessage())
+                );
     }
 
+    //* 최후의 보루 핸들러 : 위에서 처리하지 못한 나머지 "모든 예외"를 잡는다
+    //예상 못한 예외에 대해서 안전망 역할 수행
     @ExceptionHandler(OrderNotFoundException.class)
     public ResponseEntity<ErrorResponseDto> orderNotFoundException(OrderNotFoundException e) {
         log.warn("404 응답(주문 없음) : {}", e.getMessage());

@@ -10,6 +10,8 @@ import org.hibernate.annotations.SQLRestriction;
 @Entity
 @Table(name = "menus")
 @Getter
+@SQLDelete(sql = "UPDATE menus SET deleted = true, deleted_at = NOW() WHERE id = ?")
+@SQLRestriction("deleted = false")
 public class Menu extends BaseEntity {
 
     @Id
