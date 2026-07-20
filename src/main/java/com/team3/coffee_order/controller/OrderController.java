@@ -23,6 +23,19 @@ public class OrderController {
     // TODO: create
 
     // TODO: read
+    @GetMapping
+    public ResponseEntity<List<OrderGetResponse>> getOrderByEmail(@RequestParam String email) {
+        return ResponseEntity.status(HttpStatus.OK).body(orderService.getOrderByEmail(email));
+    }
+
+    @GetMapping("/{orderId}")
+    public ResponseEntity<OrderGetResponse> getOrderById(
+            @PathVariable Long orderId,
+            @RequestParam String email
+    ) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(orderService.getOrderByIdAndEmail(orderId, email));
+    }
 
     // TODO: update
     @PatchMapping("/{orderId}/status")
