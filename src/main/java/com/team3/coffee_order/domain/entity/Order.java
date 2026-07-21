@@ -6,6 +6,7 @@ import lombok.Getter;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 import com.team3.coffee_order.exception.InvalidOrderStatusTransitionException;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -75,10 +76,19 @@ public class Order extends BaseEntity {
 
         if (!status.canChangeTo(nextStatus)) {
             throw new InvalidOrderStatusTransitionException(
-                status + "에서 " + nextStatus + "로 변경할 수 없습니다."
+                    status + "에서 " + nextStatus + "로 변경할 수 없습니다."
             );
         }
 
         this.status = nextStatus;
+    }
+
+    // 호출 경로와 관계없이 동일한 배송지 변경 규칙을 보장하기 위해 엔티티 내부에서 검증
+    public void updateShippingAddress(String address, String zipCode) {
+        if (status != OrderStatus.ORDERED)
+            throw new InvalidOrderStatusTransitionException("주문이 취소되었거나 배송이 시작된 이후에는 배송지를 변경할 수 없습니다.");
+
+        this.address = address;
+        this.zipCode = zipCode;
     }
 }

@@ -8,9 +8,7 @@ import com.team3.coffee_order.dto.OrderCreateRequest;
 import com.team3.coffee_order.dto.OrderCreateResponse;
 import com.team3.coffee_order.dto.OrderItemRequest;
 import com.team3.coffee_order.dto.OrderItemResponse;
-import com.team3.coffee_order.dto.order.OrderGetResponse;
-import com.team3.coffee_order.dto.order.OrderStatusResponseDto;
-import com.team3.coffee_order.dto.order.OrderStatusUpdateRequestDto;
+import com.team3.coffee_order.dto.order.*;
 import com.team3.coffee_order.exception.*;
 import com.team3.coffee_order.mapper.OrderMapper;
 import lombok.RequiredArgsConstructor;
@@ -151,7 +149,7 @@ public class OrderService {
     @Transactional(readOnly = true)
     public OrderGetResponse getOrderById(Long orderId) {
         Order order = orderRepository.findDetailById(orderId)
-                .orElseThrow(() -> new OrderNotFoundException("해당하는 주문이 존재하지 않습니다. id = "+orderId));
+                .orElseThrow(() -> new OrderNotFoundException("해당하는 주문이 존재하지 않습니다. id = " + orderId));
 
         Map<Long, OrderItemMenuInfoProjection> menuInfoMap = getMenuInfoMap(List.of(order));
 
@@ -168,7 +166,7 @@ public class OrderService {
         String trimmedEmail = email.trim();
 
         Order order = orderRepository.findDetailByIdAndCustomerEmail(orderId, trimmedEmail)
-                .orElseThrow(() -> new OrderNotFoundException("해당하는 주문이 존재하지 않습니다. id = "+orderId));
+                .orElseThrow(() -> new OrderNotFoundException("해당하는 주문이 존재하지 않습니다. id = " + orderId));
 
         Map<Long, OrderItemMenuInfoProjection> menuInfoMap = getMenuInfoMap(List.of(order));
 
@@ -245,8 +243,6 @@ public class OrderService {
     }
 
 
-
-
     // TODO: update
     @Transactional
     public ResponseEntity<OrderStatusResponseDto> updateOrderStatus(Long orderId, OrderStatusUpdateRequestDto request) {
@@ -263,7 +259,7 @@ public class OrderService {
 
     // 배송 시작 전인 ORDERED 상태에서만 고객이 주문을 취소할 수 있다.
     @Transactional
-    public ResponseEntity<OrderStatusResponseDto> cancelOrder(Long orderId, String email){
+    public ResponseEntity<OrderStatusResponseDto> cancelOrder(Long orderId, String email) {
 
         if (email == null || email.isBlank()) {
             throw new InvalidEmailException(
@@ -288,11 +284,39 @@ public class OrderService {
                 .body(new OrderStatusResponseDto(order));
     }
 
+    // 고객 주문의 배송지를 배송 시작 전에 변경한다.
+    @Transactional
+    public ResponseEntity<OrderAddressResponseDto> updateShippingAddress(
+            Long orderId,
+            String email,
+            OrderAddressUpdateRequestDto request
+    ) {
+        if (email == null || email.isBlank())
+            throw new InvalidEmailException("이메일은 비어 있을 수 없습니다.");
+
+        String trimmedEmail = email.trim();
+
+        Order order = orderRepository
+                .findDetailByIdAndCustomerEmail(orderId, trimmedEmail)
+                .orElseThrow(() -> new OrderNotFoundException(
+                        "해당하는 주문이 존재하지 않습니다. id = " + orderId
+                ));
+
+        order.updateShippingAddress(
+                request.getAddress().trim(),
+                request.getZipCode().trim()
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(new OrderAddressResponseDto(order));
+    }
+
 
     // TODO: delete
-    public ResponseEntity<Void> deleteOrder(Long id){
+    public ResponseEntity<Void> deleteOrder(Long id) {
         Order order = orderRepository.findById(id)
-                .orElseThrow(()->new NotFoundException("해당하는 주문을 찾을 수 없습니다. id = "+id));
+                .orElseThrow(() -> new NotFoundException("해당하는 주문을 찾을 수 없습니다. id = " + id));
 
         orderRepository.delete(order);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();

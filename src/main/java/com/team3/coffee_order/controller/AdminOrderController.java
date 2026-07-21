@@ -1,7 +1,10 @@
 package com.team3.coffee_order.controller;
 
 import com.team3.coffee_order.dto.order.OrderGetResponse;
+import com.team3.coffee_order.dto.order.OrderStatusResponseDto;
+import com.team3.coffee_order.dto.order.OrderStatusUpdateRequestDto;
 import com.team3.coffee_order.service.OrderService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,5 +37,14 @@ public class AdminOrderController {
     @GetMapping("/shipping-target")
     public ResponseEntity<List<OrderGetResponse>> getShippingTargetOrders(@RequestParam String date) {
         return ResponseEntity.status(HttpStatus.OK).body(orderService.getShippingTargetOrders(date));
+    }
+
+    // update
+    @PatchMapping("/{orderId}/status")
+    public ResponseEntity<OrderStatusResponseDto> updateOrderStatus(
+            @PathVariable Long orderId,
+            @Valid @RequestBody OrderStatusUpdateRequestDto request
+    ) {
+        return orderService.updateOrderStatus(orderId, request);
     }
 }
