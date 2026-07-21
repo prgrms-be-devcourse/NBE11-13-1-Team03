@@ -3,6 +3,7 @@ package com.team3.coffee_order.dto.order;
 import com.team3.coffee_order.dto.orderItem.OrderItemRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,13 +17,13 @@ import java.util.List;
 public class OrderCreateRequest {
 
     @Email
-    @NotEmpty
+    @NotBlank
     private String email;
 
-    @NotEmpty
+    @NotBlank
     private String address;
 
-    @NotEmpty
+    @NotBlank
     private String zipCode;
 
     @Valid
