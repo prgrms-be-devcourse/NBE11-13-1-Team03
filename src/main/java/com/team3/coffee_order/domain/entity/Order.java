@@ -63,9 +63,6 @@ public class Order extends BaseEntity {
 
     // 호출 경로와 관계없이 동일한 주문 상태 변경 규칙을 보장하기 위해 엔티티 내부에서 검증
     public void updateStatus(OrderStatus nextStatus) {
-        if (nextStatus == null) {
-            throw new InvalidArgumentException("변경할 수 없습니다.");
-        }
 
         if (!status.canChangeTo(nextStatus)) {
             throw new InvalidArgumentException(
