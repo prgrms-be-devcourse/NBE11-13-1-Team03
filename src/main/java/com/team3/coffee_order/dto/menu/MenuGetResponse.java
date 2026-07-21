@@ -9,5 +9,6 @@ public class MenuGetResponse {
     private Long menuId;
     private String name;
     private int price;
+    private int stock;
     private String description;
 }

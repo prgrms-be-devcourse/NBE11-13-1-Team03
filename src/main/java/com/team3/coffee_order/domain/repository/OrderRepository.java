@@ -62,21 +62,6 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             @Param("email") String email
     );
 
-    // createdAt 시간 범위와 status 조건을 함께 사용해 배송 예정 주문만 조회한다.
-    @Query("""
-            SELECT distinct o from Order o
-            join fetch o.customer c
-            left join fetch o.orderItems oi
-            where o.createdAt >= :startDateTime
-            and o.createdAt < :endDateTime
-            and o.status = :status
-            """)
-    List<Order> findShippingTargetOrders(
-            @Param("startDateTime") LocalDateTime startDate,
-            @Param("endDateTime") LocalDateTime endDate,
-            @Param("status") OrderStatus status
-    );
-
     // 배치 대상 id만 조회 (deleted=false는 Order 엔티티의 @SQLRestriction으로 자동 적용됨)
     @Query("""
         SELECT o.id

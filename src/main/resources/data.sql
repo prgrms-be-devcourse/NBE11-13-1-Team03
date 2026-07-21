@@ -6,6 +6,7 @@ USE coffee;
 
 show tables;
 desc customers;
+desc menus;
 -- 1. 고객
 CREATE TABLE customers (
                           id          BIGINT       NOT NULL AUTO_INCREMENT,
@@ -22,6 +23,7 @@ CREATE TABLE menus (
                       id          BIGINT       NOT NULL AUTO_INCREMENT,
                       name        VARCHAR(255) NOT NULL,
                       price       INT          NOT NULL,
+                      stock       INT          NOT NULL,
                       description VARCHAR(255),
                       created_at  DATETIME(6)  NOT NULL,
                       updated_at  DATETIME(6),

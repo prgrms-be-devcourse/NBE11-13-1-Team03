@@ -11,6 +11,7 @@ public class MenuMapper {
                 menu.getId(),
                 menu.getName(),
                 menu.getPrice(),
+                menu.getStock(),
                 menu.getDescription()
         );
     }

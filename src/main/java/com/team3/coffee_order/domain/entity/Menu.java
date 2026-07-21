@@ -10,7 +10,6 @@ import org.hibernate.annotations.SQLRestriction;
 @Getter
 @Table(name = "menus")
 @SQLDelete(sql = "UPDATE menus SET deleted = true, deleted_at = NOW() WHERE id = ?")
-@SQLRestriction("deleted = false")
 public class Menu extends BaseEntity {
 
     @Id
@@ -23,6 +22,9 @@ public class Menu extends BaseEntity {
     @Column(nullable = false)
     private Integer price;
 
+    @Column(nullable = false)
+    private Integer stock;
+
     private String description;
 
     @Column(nullable = false, updatable = false)
@@ -32,17 +34,19 @@ public class Menu extends BaseEntity {
 
     protected Menu() {}
 
-    public Menu(String name, Integer price, String description) {
+    public Menu(String name, Integer price, Integer stock, String description) {
         this.name = name;
         this.price = price;
+        this.stock = stock;
         this.description = description;
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }
 
-    public void update(String name, Integer price, String description) {
+    public void update(String name, Integer price, Integer stock, String description) {
         this.name = name;
         this.price = price;
+        this.stock = stock;
         this.description = description;
         this.updatedAt = LocalDateTime.now();
     }

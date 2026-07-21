@@ -10,6 +10,7 @@ public class MenuResponse {
     private final Long id;
     private final String name;
     private final Integer price;
+    private final Integer stock;
     private final String description;
     private final LocalDateTime createdAt;
     private final LocalDateTime updatedAt;
@@ -18,6 +19,7 @@ public class MenuResponse {
         this.id = menu.getId();
         this.name = menu.getName();
         this.price = menu.getPrice();
+        this.stock = menu.getStock();
         this.description = menu.getDescription();
         this.createdAt = menu.getCreatedAt();
         this.updatedAt = menu.getUpdatedAt();

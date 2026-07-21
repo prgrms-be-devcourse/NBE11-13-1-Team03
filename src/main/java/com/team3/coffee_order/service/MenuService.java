@@ -40,7 +40,7 @@ public class MenuService {
         String description = (request.getDescription() == null || request.getDescription().isBlank())
                 ? null
                 : request.getDescription();
-        Menu menu = new Menu(request.getName(), request.getPrice(), description);
+        Menu menu = new Menu(request.getName(), request.getPrice(), request.getStock(), description);
 
         return new MenuResponse(menuRepository.save(menu));
     }
@@ -68,7 +68,7 @@ public class MenuService {
         Menu menu = menuRepository.findById(menuId)
                 .orElseThrow(() -> new NotFoundException("메뉴를 찾을 수 없습니다. menuId="+menuId));
 
-        menu.update(request.getName(), request.getPrice(), request.getDescription());
+        menu.update(request.getName(), request.getPrice(), request.getStock(), request.getDescription());
 
         return ResponseEntity
                 .status(HttpStatus.OK)

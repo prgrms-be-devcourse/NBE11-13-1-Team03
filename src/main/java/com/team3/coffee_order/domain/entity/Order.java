@@ -14,7 +14,6 @@ import java.util.List;
 @Getter
 @Table(name = "orders")
 @SQLDelete(sql = "UPDATE orders SET deleted = true, deleted_at = NOW() WHERE id = ?")
-@SQLRestriction("deleted = false")
 public class Order extends BaseEntity {
 
     @Id

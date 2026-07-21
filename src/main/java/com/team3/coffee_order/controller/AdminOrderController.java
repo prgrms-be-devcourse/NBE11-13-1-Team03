@@ -33,11 +33,6 @@ public class AdminOrderController {
         return ResponseEntity.status(HttpStatus.OK).body(orderService.getOrderAdmin(orderId));
     }
 
-    @GetMapping("/shipping-target")
-    public ResponseEntity<List<OrderGetResponse>> getShippingTargetOrders(@RequestParam String date) {
-        return ResponseEntity.status(HttpStatus.OK).body(orderService.getShippingTargetOrders(date));
-    }
-
     // update
     @PatchMapping("/{orderId}/status")
     public ResponseEntity<OrderStatusResponse> updateOrderStatus(
