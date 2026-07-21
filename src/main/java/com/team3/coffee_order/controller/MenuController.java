@@ -56,7 +56,11 @@ public class MenuController {
             @PathVariable Long menuId,
             @Valid @RequestBody MenuUpdateRequest request
     ) {
-        return menuService.updateMenu(menuId, request);
+        MenuResponse response = menuService.updateMenu(menuId, request);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(response);
     }
 
     // TODO: delete
@@ -68,6 +72,7 @@ public class MenuController {
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteMenu(@PathVariable Long id){
-        return menuService.deleteMenu(id);
+        menuService.deleteMenu(id);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

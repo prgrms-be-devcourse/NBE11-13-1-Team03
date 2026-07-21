@@ -62,7 +62,7 @@ CREATE TABLE order_items (
 );
 
 
-
+ALTER TABLE orders DROP COLUMN order_date;
 
 
 # Test

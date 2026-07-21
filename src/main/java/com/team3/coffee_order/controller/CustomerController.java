@@ -1,13 +1,11 @@
 package com.team3.coffee_order.controller;
 
-import com.team3.coffee_order.domain.entity.Customer;
-import com.team3.coffee_order.domain.repository.CustomerRepository;
-import com.team3.coffee_order.exception.NotFoundException;
 import com.team3.coffee_order.service.CustomerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,6 +30,7 @@ public class CustomerController {
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCustomer(@PathVariable Long id){
-        return customerService.deleteCustomer(id);
+        customerService.deleteCustomer(id);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

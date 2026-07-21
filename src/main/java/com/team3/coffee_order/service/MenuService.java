@@ -11,8 +11,6 @@ import com.team3.coffee_order.exception.NotFoundException;
 import com.team3.coffee_order.mapper.MenuMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -63,25 +61,22 @@ public class MenuService {
 
     // TODO: update
     @Transactional
-    public ResponseEntity<MenuResponse> updateMenu(Long menuId, MenuUpdateRequest request) {
+    public MenuResponse updateMenu(Long menuId, MenuUpdateRequest request) {
         // 검증된 요청 값으로 메뉴를 조회하고, 엔티티 변경 메서드로 수정 결과를 반환한다.
         Menu menu = menuRepository.findById(menuId)
                 .orElseThrow(() -> new NotFoundException("메뉴를 찾을 수 없습니다. menuId="+menuId));
 
         menu.update(request.getName(), request.getPrice(), request.getStock(), request.getDescription());
 
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(new MenuResponse(menu));
+        return new MenuResponse(menu);
     }
 
     // TODO: delete
     @Transactional
-    public ResponseEntity<Void> deleteMenu(Long menuId){
+    public void deleteMenu(Long menuId){
         Menu menu = menuRepository.findById(menuId)
                 .orElseThrow(()->  new NotFoundException("메뉴를 찾을 수 없습니다. menuId="+menuId));
 
         menuRepository.delete(menu);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }
