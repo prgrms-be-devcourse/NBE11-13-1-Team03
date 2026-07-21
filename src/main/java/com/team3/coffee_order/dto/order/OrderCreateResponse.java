@@ -1,9 +1,9 @@
-package com.team3.coffee_order.dto;
+package com.team3.coffee_order.dto.order;
 
+import com.team3.coffee_order.dto.orderItem.OrderItemResponse;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @Getter
@@ -11,7 +11,6 @@ import java.util.List;
 public class OrderCreateResponse {
 
     private Long orderId;
-    private LocalDate orderDate;
     private String status;
     private Integer totalAmount;
     private List<OrderItemResponse> items;

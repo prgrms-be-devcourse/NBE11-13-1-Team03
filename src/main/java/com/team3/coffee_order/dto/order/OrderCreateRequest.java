@@ -1,5 +1,6 @@
-package com.team3.coffee_order.dto;
+package com.team3.coffee_order.dto.order;
 
+import com.team3.coffee_order.dto.orderItem.OrderItemRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;

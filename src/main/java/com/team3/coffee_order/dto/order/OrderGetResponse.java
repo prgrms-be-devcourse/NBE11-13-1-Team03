@@ -13,7 +13,6 @@ public class OrderGetResponse {
     private String email;
     private String address;
     private String zipCode;
-    private String orderDate;
     private String status;
     private int totalPrice;
     private List<OrderItemGetResponse> items;

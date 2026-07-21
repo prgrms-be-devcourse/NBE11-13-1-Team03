@@ -1,9 +1,9 @@
 package com.team3.coffee_order.controller;
 
-import com.team3.coffee_order.dto.MenuCreateRequest;
+import com.team3.coffee_order.dto.menu.MenuCreateRequest;
 import com.team3.coffee_order.dto.menu.MenuGetResponse;
-import com.team3.coffee_order.dto.menu.MenuResponseDto;
-import com.team3.coffee_order.dto.menu.MenuUpdateRequestDto;
+import com.team3.coffee_order.dto.menu.MenuResponse;
+import com.team3.coffee_order.dto.menu.MenuUpdateRequest;
 import com.team3.coffee_order.service.MenuService;
 import jakarta.validation.Valid;
 import io.swagger.v3.oas.annotations.Operation;
@@ -29,7 +29,7 @@ public class MenuController {
 
     // TODO: create
     @PostMapping
-    public ResponseEntity<MenuResponseDto> createMenu(
+    public ResponseEntity<MenuResponse> createMenu(
             @Valid
             @RequestBody
             MenuCreateRequest request
@@ -52,9 +52,9 @@ public class MenuController {
 
     // TODO: update
     @PutMapping("/{menuId}")
-    public ResponseEntity<MenuResponseDto> updateMenu(
+    public ResponseEntity<MenuResponse> updateMenu(
             @PathVariable Long menuId,
-            @Valid @RequestBody MenuUpdateRequestDto request
+            @Valid @RequestBody MenuUpdateRequest request
     ) {
         return menuService.updateMenu(menuId, request);
     }

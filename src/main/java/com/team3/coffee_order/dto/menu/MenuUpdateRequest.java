@@ -6,7 +6,7 @@ import jakarta.validation.constraints.PositiveOrZero;
 import lombok.Getter;
 
 @Getter
-public class MenuUpdateRequestDto {
+public class MenuUpdateRequest {
 
     @NotBlank(message = "메뉴 이름은 필수입니다.")
     private String name;

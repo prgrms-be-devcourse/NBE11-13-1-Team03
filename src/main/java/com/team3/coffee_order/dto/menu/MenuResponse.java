@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 import lombok.Getter;
 
 @Getter
-public class MenuResponseDto {
+public class MenuResponse {
 
     private final Long id;
     private final String name;
@@ -14,7 +14,7 @@ public class MenuResponseDto {
     private final LocalDateTime createdAt;
     private final LocalDateTime updatedAt;
 
-    public MenuResponseDto(Menu menu) {
+    public MenuResponse(Menu menu) {
         this.id = menu.getId();
         this.name = menu.getName();
         this.price = menu.getPrice();

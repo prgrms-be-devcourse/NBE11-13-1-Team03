@@ -1,7 +1,7 @@
 package com.team3.coffee_order.controller;
 
-import com.team3.coffee_order.dto.OrderCreateRequest;
-import com.team3.coffee_order.dto.OrderCreateResponse;
+import com.team3.coffee_order.dto.order.OrderCreateRequest;
+import com.team3.coffee_order.dto.order.OrderCreateResponse;
 import com.team3.coffee_order.dto.order.*;
 import com.team3.coffee_order.service.OrderService;
 import jakarta.validation.Valid;
@@ -32,7 +32,7 @@ public class OrderController {
     // TODO: read
     @GetMapping
     public ResponseEntity<List<OrderGetResponse>> getOrderByEmail(@RequestParam String email) {
-        return ResponseEntity.status(HttpStatus.OK).body(orderService.getOrderByEmail(email));
+        return ResponseEntity.status(HttpStatus.OK).body(orderService.getOrder(email));
     }
 
     @GetMapping("/{orderId}")
@@ -41,12 +41,12 @@ public class OrderController {
             @RequestParam String email
     ) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(orderService.getOrderByIdAndEmail(orderId, email));
+                .body(orderService.getOrder(orderId, email));
     }
 
     // TODO: update
     @PatchMapping("/{orderId}/cancel")
-    public ResponseEntity<OrderStatusResponseDto> cancelOrder(
+    public ResponseEntity<OrderStatusResponse> cancelOrder(
             @PathVariable Long orderId,
             @RequestParam String email
     ) {
@@ -54,10 +54,10 @@ public class OrderController {
     }
 
     @PatchMapping("/{orderId}/shipping-address")
-    public ResponseEntity<OrderAddressResponseDto> updateShippingAddress(
+    public ResponseEntity<OrderAddressResponse> updateShippingAddress(
             @PathVariable Long orderId,
             @RequestParam String email,
-            @Valid @RequestBody OrderAddressUpdateRequestDto request
+            @Valid @RequestBody OrderAddressUpdateRequest request
     ) {
         return orderService.updateShippingAddress(orderId, email, request);
     }

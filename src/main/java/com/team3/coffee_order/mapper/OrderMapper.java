@@ -26,7 +26,6 @@ public class OrderMapper {
                 order.getCustomer().getEmail(),
                 order.getAddress(),
                 order.getZipCode(),
-                order.getOrderDate().toString(),
                 order.getStatus().name(),
                 totalPrice,
                 items

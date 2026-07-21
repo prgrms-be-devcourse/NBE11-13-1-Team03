@@ -5,12 +5,12 @@ import com.team3.coffee_order.domain.entity.OrderStatus;
 import lombok.Getter;
 
 @Getter
-public class OrderStatusResponseDto {
+public class OrderStatusResponse {
 
     private final Long id;
     private final OrderStatus status;
 
-    public OrderStatusResponseDto(Order order) {
+    public OrderStatusResponse(Order order) {
         this.id = order.getId();
         this.status = order.getStatus();
     }

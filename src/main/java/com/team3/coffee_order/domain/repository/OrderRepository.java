@@ -8,18 +8,14 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import java.time.LocalDate;
-import java.util.Optional;
-
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
-    Optional<Order> findByCustomerAndOrderDate(Customer customer, LocalDate orderDate);
-  
+    Optional<Order> findByCustomerAndCreatedAtBetween(Customer customer, LocalDateTime start, LocalDateTime end);
+
     @Query("""
             SELECT distinct o from Order o
             join fetch o.customer c
@@ -37,13 +33,11 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             left join fetch o.orderItems oi
             where (:email is null or c.email = :email)
             and (:status is null or o.status = :status)
-            and (:orderDate is null or o.orderDate = :orderDate)
             and (:useOrderIds = false  or o.id in :orderIds)
             """)
     List<Order> searchOrders(
             @Param("email") String email,
             @Param("status") OrderStatus status,
-            @Param("orderDate") LocalDate orderDate,
             @Param("useOrderIds") boolean useOrderIds,
             @Param("orderIds") List<Long> orderIds
     );

@@ -1,13 +1,11 @@
 package com.team3.coffee_order.domain.entity;
 
-import com.team3.coffee_order.exception.InvalidOrderStatusException;
+import com.team3.coffee_order.exception.InvalidArgumentException;
 import jakarta.persistence.*;
 import lombok.Getter;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
-import com.team3.coffee_order.exception.InvalidOrderStatusTransitionException;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,9 +24,6 @@ public class Order extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id")
     private Customer customer;
-
-    @Column(nullable = false)
-    private LocalDate orderDate;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -51,13 +46,11 @@ public class Order extends BaseEntity {
 
     public Order(
             Customer customer,
-            LocalDate orderDate,
             OrderStatus status,
             String address,
             String zipCode
     ) {
         this.customer = customer;
-        this.orderDate = orderDate;
         this.status = status;
         this.address = address;
         this.zipCode = zipCode;
@@ -71,11 +64,11 @@ public class Order extends BaseEntity {
     // 호출 경로와 관계없이 동일한 주문 상태 변경 규칙을 보장하기 위해 엔티티 내부에서 검증
     public void updateStatus(OrderStatus nextStatus) {
         if (nextStatus == null) {
-            throw new InvalidOrderStatusTransitionException("변경할 수 없습니다.");
+            throw new InvalidArgumentException("변경할 수 없습니다.");
         }
 
         if (!status.canChangeTo(nextStatus)) {
-            throw new InvalidOrderStatusTransitionException(
+            throw new InvalidArgumentException(
                     status + "에서 " + nextStatus + "로 변경할 수 없습니다."
             );
         }
@@ -86,7 +79,7 @@ public class Order extends BaseEntity {
     // 호출 경로와 관계없이 동일한 배송지 변경 규칙을 보장하기 위해 엔티티 내부에서 검증
     public void updateShippingAddress(String address, String zipCode) {
         if (status != OrderStatus.ORDERED)
-            throw new InvalidOrderStatusTransitionException("주문이 취소되었거나 배송이 시작된 이후에는 배송지를 변경할 수 없습니다.");
+            throw new InvalidArgumentException("주문이 취소되었거나 배송이 시작된 이후에는 배송지를 변경할 수 없습니다.");
 
         this.address = address;
         this.zipCode = zipCode;

@@ -34,7 +34,6 @@ CREATE TABLE menus (
 CREATE TABLE orders (
                          id          BIGINT       NOT NULL AUTO_INCREMENT,
                          customer_id BIGINT,
-                         order_date  DATE         NOT NULL,
                          status      VARCHAR(255) NOT NULL,
                          address     VARCHAR(255) NOT NULL,
                          zip_code    VARCHAR(255) NOT NULL,
@@ -79,7 +78,6 @@ SET @customer_id = LAST_INSERT_ID();
 
 INSERT INTO orders (
     customer_id,
-    order_date,
     status,
     address,
     zip_code,
@@ -87,7 +85,6 @@ INSERT INTO orders (
     deleted
 ) VALUES (
              @customer_id,
-             CURDATE(),
              'SHIPPING',
              '서울시 강남구',
              '12345',

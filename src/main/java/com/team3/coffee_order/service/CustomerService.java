@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class CustomerService {
 
     private final CustomerRepository customerRepository;
@@ -30,6 +31,7 @@ public class CustomerService {
     // TODO: update
 
     // TODO: delete
+    @Transactional
     public ResponseEntity<Void> deleteCustomer(Long id){
 
         Customer customer = customerRepository.findById(id)

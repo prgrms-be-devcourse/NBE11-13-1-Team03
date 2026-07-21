@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class OrderAddressUpdateRequestDto {
+public class OrderAddressUpdateRequest {
     @NotBlank
     private String address;
     @NotBlank

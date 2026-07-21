@@ -2,12 +2,11 @@ package com.team3.coffee_order.service;
 
 import com.team3.coffee_order.domain.entity.Menu;
 import com.team3.coffee_order.domain.repository.MenuRepository;
-import com.team3.coffee_order.dto.MenuCreateRequest;
+import com.team3.coffee_order.dto.menu.MenuCreateRequest;
 import com.team3.coffee_order.dto.menu.MenuGetResponse;
-import com.team3.coffee_order.dto.menu.MenuResponseDto;
-import com.team3.coffee_order.dto.menu.MenuUpdateRequestDto;
+import com.team3.coffee_order.dto.menu.MenuResponse;
+import com.team3.coffee_order.dto.menu.MenuUpdateRequest;
 import com.team3.coffee_order.exception.DuplicateMenuNameException;
-import com.team3.coffee_order.exception.MenuNotFoundException;
 import com.team3.coffee_order.exception.NotFoundException;
 import com.team3.coffee_order.mapper.MenuMapper;
 import lombok.RequiredArgsConstructor;
@@ -28,13 +27,13 @@ public class MenuService {
     private final MenuMapper menuMapper;
 
     // TODO: create
-    public Menu getMenuEntityById(Long id) {
-        return menuRepository.findById(id)
-                .orElseThrow(() -> new MenuNotFoundException("메뉴를 찾을 수 없습니다."));
+    public Menu getMenuEntity(Long menuId) {
+        return menuRepository.findById(menuId)
+                .orElseThrow(() -> new NotFoundException("메뉴를 찾을 수 없습니다. menuId="+menuId));
     }
 
     @Transactional
-    public MenuResponseDto create(MenuCreateRequest request) {
+    public MenuResponse create(MenuCreateRequest request) {
         if (menuRepository.existsByName(request.getName()))
             throw new DuplicateMenuNameException("이미 존재하는 메뉴입니다.");
 
@@ -43,7 +42,7 @@ public class MenuService {
                 : request.getDescription();
         Menu menu = new Menu(request.getName(), request.getPrice(), description);
 
-        return new MenuResponseDto(menuRepository.save(menu));
+        return new MenuResponse(menuRepository.save(menu));
     }
 
     // TODO: read
@@ -55,32 +54,32 @@ public class MenuService {
                 .toList();
     }
 
-    public MenuGetResponse getMenu(long menuId) {
+    public MenuGetResponse getMenu(Long menuId) {
         Menu menu = menuRepository.findById(menuId)
-                .orElseThrow(() -> new MenuNotFoundException("메뉴를 찾을 수 없습니다. menuId=" + menuId));
+                .orElseThrow(() -> new NotFoundException("메뉴를 찾을 수 없습니다. menuId=" + menuId));
 
         return menuMapper.toMenuGetResponse(menu);
     }
 
     // TODO: update
     @Transactional
-    public ResponseEntity<MenuResponseDto> updateMenu(Long menuId, MenuUpdateRequestDto request) {
+    public ResponseEntity<MenuResponse> updateMenu(Long menuId, MenuUpdateRequest request) {
         // 검증된 요청 값으로 메뉴를 조회하고, 엔티티 변경 메서드로 수정 결과를 반환한다.
         Menu menu = menuRepository.findById(menuId)
-                .orElseThrow(() -> new MenuNotFoundException("메뉴를 찾을 수 없습니다."));
+                .orElseThrow(() -> new NotFoundException("메뉴를 찾을 수 없습니다. menuId="+menuId));
 
         menu.update(request.getName(), request.getPrice(), request.getDescription());
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(new MenuResponseDto(menu));
+                .body(new MenuResponse(menu));
     }
 
     // TODO: delete
     @Transactional
-    public ResponseEntity<Void> deleteMenu(Long id){
-        Menu menu = menuRepository.findById(id)
-                .orElseThrow(()->  new NotFoundException("해당하는 메뉴를 찾을 수 없습니다. id = "+id));
+    public ResponseEntity<Void> deleteMenu(Long menuId){
+        Menu menu = menuRepository.findById(menuId)
+                .orElseThrow(()->  new NotFoundException("메뉴를 찾을 수 없습니다. menuId="+menuId));
 
         menuRepository.delete(menu);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
