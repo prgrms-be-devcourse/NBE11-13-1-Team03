@@ -4,6 +4,7 @@ import com.team3.coffee_order.domain.entity.Customer;
 import com.team3.coffee_order.domain.entity.Order;
 import com.team3.coffee_order.domain.entity.OrderStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -81,4 +82,25 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             @Param("endDateTime") LocalDateTime endDate,
             @Param("status") OrderStatus status
     );
+
+    // 배치 대상 id만 조회 (deleted=false는 Order 엔티티의 @SQLRestriction으로 자동 적용됨)
+    @Query("""
+        SELECT o.id
+        FROM Order o
+        WHERE o.createdAt >= :startDateTime
+        AND o.createdAt < :endDateTime
+        AND o.status = :status
+        """)
+    List<Long> findIdsByCreatedAtBetweenAndStatus(
+            @Param("startDateTime") LocalDateTime startDateTime,
+            @Param("endDateTime") LocalDateTime endDateTime,
+            @Param("status") OrderStatus status
+    );
+
+    //OrderStatus 배치 처리로 변경 : bulk 연산으로 메모리 사용 최소화, DB 왕복 횟수 1회로 개선
+    //bulk 연산은 영속성 컨텍스트를 거치지 않고 DB로 직접 SQL 날림 => clearAutomatically = true
+    //=> 영속성 컨텍스트에 남은 변경 전 데이터 지우고, 새로 DB에서 읽어옴
+    @Modifying(clearAutomatically = true)
+    @Query("UPDATE Order o set o.status = :status WHERE o.id IN :ids")
+    int bulkUpdateStatus(@Param("ids") List<Long> ids, @Param("status") OrderStatus status);
 }
