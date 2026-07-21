@@ -3,8 +3,10 @@ package com.team3.coffee_order.mapper;
 import com.team3.coffee_order.domain.entity.Order;
 import com.team3.coffee_order.domain.entity.OrderItem;
 import com.team3.coffee_order.domain.repository.OrderItemMenuInfoProjection;
+import com.team3.coffee_order.dto.order.OrderCreateResponse;
 import com.team3.coffee_order.dto.order.OrderGetResponse;
 import com.team3.coffee_order.dto.orderItem.OrderItemGetResponse;
+import com.team3.coffee_order.dto.orderItem.OrderItemResponse;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -46,5 +48,26 @@ public class OrderMapper {
                 orderItem.getQuantity(),
                 orderItem.getUnitPrice()
         );
+    }
+
+    public OrderCreateResponse toOrderCreateResponse(Order order) {
+        int totalAmount = order.getOrderItems().stream()
+                .mapToInt(item -> item.getUnitPrice() * item.getQuantity())
+                .sum();
+
+        List<OrderItemResponse> itemResponses = order.getOrderItems().stream()
+                .map(item -> OrderItemResponse.builder()
+                        .menuName(item.getMenu().getName())
+                        .quantity(item.getQuantity())
+                        .unitPrice(item.getUnitPrice())
+                        .build())
+                .toList();
+
+        return OrderCreateResponse.builder()
+                .orderId(order.getId())
+                .status(order.getStatus().name())
+                .totalAmount(totalAmount)
+                .items(itemResponses)
+                .build();
     }
 }

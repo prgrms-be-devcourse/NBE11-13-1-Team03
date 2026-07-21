@@ -26,7 +26,9 @@ public class OrderController {
             @RequestBody
             OrderCreateRequest request
     ) {
-        return orderService.create(request);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(orderService.create(request));
     }
 
     // TODO: read
