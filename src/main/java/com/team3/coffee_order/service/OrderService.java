@@ -7,7 +7,6 @@ import com.team3.coffee_order.domain.repository.OrderRepository;
 import com.team3.coffee_order.dto.order.OrderCreateRequest;
 import com.team3.coffee_order.dto.order.OrderCreateResponse;
 import com.team3.coffee_order.dto.orderItem.OrderItemRequest;
-import com.team3.coffee_order.dto.orderItem.OrderItemResponse;
 import com.team3.coffee_order.dto.order.*;
 import com.team3.coffee_order.exception.*;
 import com.team3.coffee_order.mapper.OrderMapper;
@@ -39,7 +38,7 @@ public class OrderService {
 
     // TODO: create
     @Transactional
-    public ResponseEntity<OrderCreateResponse> create(OrderCreateRequest request) {
+    public OrderCreateResponse create(OrderCreateRequest request) {
         List<OrderItemRequest> items = request.getItems();
 
         Customer customer = customerService.findOrCreateByEmail(request.getEmail());
@@ -52,8 +51,7 @@ public class OrderService {
 
         Order order = orderRepository.findByCustomerAndCreatedAtBetween(customer, windowStart, windowEnd)
                 .orElseGet(() -> orderRepository.save(
-                        new Order(customer, OrderStatus.ORDERED, request.getAddress(), request.getZipCode())
-                ));
+                        new Order(customer, OrderStatus.ORDERED, request.getAddress(), request.getZipCode())));
 
         for (OrderItemRequest item : items) {
             Menu menu = menuService.getMenuEntity(item.getMenuId());
@@ -62,26 +60,7 @@ public class OrderService {
             orderItemRepository.save(orderItem);
         }
 
-        int totalAmount = order.getOrderItems().stream()
-                .mapToInt(item -> item.getUnitPrice() * item.getQuantity())
-                .sum();
-
-        List<OrderItemResponse> itemResponses = order.getOrderItems().stream()
-                .map(oi -> OrderItemResponse.builder()
-                        .menuName(oi.getMenu().getName())
-                        .quantity(oi.getQuantity())
-                        .unitPrice(oi.getUnitPrice())
-                        .build())
-                .toList();
-
-        OrderCreateResponse response = OrderCreateResponse.builder()
-                .orderId(order.getId())
-                .status(order.getStatus().name())
-                .totalAmount(totalAmount)
-                .items(itemResponses)
-                .build();
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return orderMapper.toOrderCreateResponse(order);
     }
 
     // TODO: read

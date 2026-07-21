@@ -14,6 +14,7 @@ public class OrderItemRequest {
     @NotNull
     private Long menuId;
 
+    @NotNull
     @Min(value = 1, message = "수량은 1개 이상이어야 합니다.")
     private Integer quantity;
 }
