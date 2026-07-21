@@ -2,9 +2,7 @@ package com.team3.coffee_order.controller;
 
 import com.team3.coffee_order.dto.OrderCreateRequest;
 import com.team3.coffee_order.dto.OrderCreateResponse;
-import com.team3.coffee_order.dto.order.OrderGetResponse;
-import com.team3.coffee_order.dto.order.OrderStatusResponseDto;
-import com.team3.coffee_order.dto.order.OrderStatusUpdateRequestDto;
+import com.team3.coffee_order.dto.order.*;
 import com.team3.coffee_order.service.OrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -47,14 +45,6 @@ public class OrderController {
     }
 
     // TODO: update
-    @PatchMapping("/{orderId}/status")
-    public ResponseEntity<OrderStatusResponseDto> updateOrderStatus(
-            @PathVariable Long orderId,
-            @Valid @RequestBody OrderStatusUpdateRequestDto request
-    ) {
-        return orderService.updateOrderStatus(orderId, request);
-    }
-
     @PatchMapping("/{orderId}/cancel")
     public ResponseEntity<OrderStatusResponseDto> cancelOrder(
             @PathVariable Long orderId,
@@ -63,9 +53,18 @@ public class OrderController {
         return orderService.cancelOrder(orderId, email);
     }
 
+    @PatchMapping("/{orderId}/shipping-address")
+    public ResponseEntity<OrderAddressResponseDto> updateShippingAddress(
+            @PathVariable Long orderId,
+            @RequestParam String email,
+            @Valid @RequestBody OrderAddressUpdateRequestDto request
+    ) {
+        return orderService.updateShippingAddress(orderId, email, request);
+    }
+
     // TODO: delete
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteOrder(@PathVariable Long id){
+    public ResponseEntity<Void> deleteOrder(@PathVariable Long id) {
         return orderService.deleteOrder(id);
     }
 }
