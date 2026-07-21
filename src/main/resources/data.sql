@@ -70,10 +70,13 @@ INSERT INTO customers (
     created_at,
     deleted
 ) VALUES (
-             'test2@example.com',
+             'test9@example.com',
              NOW(),
              FALSE
          );
+
+SET @customer_id = LAST_INSERT_ID();
+
 INSERT INTO orders (
     customer_id,
     order_date,
@@ -83,9 +86,9 @@ INSERT INTO orders (
     created_at,
     deleted
 ) VALUES (
-             2,
+             @customer_id,
              CURDATE(),
-             'ORDERED',
+             'SHIPPING',
              '서울시 강남구',
              '12345',
              NOW(),
@@ -93,3 +96,14 @@ INSERT INTO orders (
          );
 
 SELECT * FROM orders;
+
+SELECT
+    o.id AS order_id,
+    o.customer_id,
+    c.id AS customer_id,
+    c.email,
+    o.status,
+    o.deleted
+FROM orders o
+         JOIN customers c ON c.id = o.customer_id
+WHERE o.id = 5;

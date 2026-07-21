@@ -55,8 +55,15 @@ public class OrderController {
         return orderService.updateOrderStatus(orderId, request);
     }
 
-    // TODO: delete
+    @PatchMapping("/{orderId}/cancel")
+    public ResponseEntity<OrderStatusResponseDto> cancelOrder(
+            @PathVariable Long orderId,
+            @RequestParam String email
+    ) {
+        return orderService.cancelOrder(orderId, email);
+    }
 
+    // TODO: delete
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteOrder(@PathVariable Long id){
         return orderService.deleteOrder(id);
