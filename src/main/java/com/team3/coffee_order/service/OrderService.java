@@ -14,6 +14,7 @@ import com.team3.coffee_order.dto.order.OrderStatusUpdateRequestDto;
 import com.team3.coffee_order.exception.*;
 import com.team3.coffee_order.mapper.OrderMapper;
 import lombok.RequiredArgsConstructor;
+import org.aspectj.weaver.ast.Or;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -259,6 +260,34 @@ public class OrderService {
                 .status(HttpStatus.OK)
                 .body(new OrderStatusResponseDto(order));
     }
+
+    // 배송 시작 전인 ORDERED 상태에서만 고객이 주문을 취소할 수 있다.
+    @Transactional
+    public ResponseEntity<OrderStatusResponseDto> cancelOrder(Long orderId, String email){
+
+        if (email == null || email.isBlank()) {
+            throw new InvalidEmailException(
+                    "이메일은 비어 있을 수 없습니다."
+            );
+        }
+
+        String trimmedEmail = email.trim();
+
+        Order order = orderRepository
+                .findDetailByIdAndCustomerEmail(orderId, trimmedEmail)
+                .orElseThrow(() ->
+                        new OrderNotFoundException(
+                                "해당하는 주문이 존재하지 않습니다. id = " + orderId
+                        )
+                );
+
+        order.updateStatus(OrderStatus.CANCELED);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(new OrderStatusResponseDto(order));
+    }
+
 
     // TODO: delete
     public ResponseEntity<Void> deleteOrder(Long id){
