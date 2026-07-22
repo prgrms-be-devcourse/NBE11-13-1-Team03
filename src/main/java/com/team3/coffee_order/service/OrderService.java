@@ -8,9 +8,12 @@ import com.team3.coffee_order.dto.order.OrderCreateRequest;
 import com.team3.coffee_order.dto.order.OrderCreateResponse;
 import com.team3.coffee_order.dto.orderItem.OrderItemRequest;
 import com.team3.coffee_order.dto.order.*;
+import com.team3.coffee_order.event.DeliveredEvent;
 import com.team3.coffee_order.exception.*;
+import com.team3.coffee_order.mapper.DeliveredEventMapper;
 import com.team3.coffee_order.mapper.OrderMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,6 +36,8 @@ public class OrderService {
     private final MenuService menuService;
     private final EmailService emailService;
     private final OrderMapper orderMapper;
+    private final DeliveredEventMapper deliveredEventMapper;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
 
     // TODO: create
@@ -185,7 +190,14 @@ public class OrderService {
         Order order = orderRepository.findByIdAndDeletedFalse(orderId)
                 .orElseThrow(() -> new NotFoundException("주문을 찾을 수 없습니다. orderId="+orderId));
 
-        order.updateStatus(request.getStatus());
+        OrderStatus nextStatus = request.getStatus();
+        order.updateStatus(nextStatus);
+
+        // 배송 완료 상태로 변경된 경우, 트랜잭션 커밋 후 Slack 알림을 보내기 위한 이벤트 발행
+        if(nextStatus == OrderStatus.DELIVERED){
+            DeliveredEvent event = deliveredEventMapper.toDeliveredEvent(order);
+            applicationEventPublisher.publishEvent(event);
+        }
 
         return new OrderStatusResponse(order);
     }

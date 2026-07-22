@@ -2,7 +2,7 @@ CREATE DATABASE coffee_order
     DEFAULT CHARACTER SET utf8mb4
     COLLATE utf8mb4_unicode_ci;
 
-USE coffee;
+USE coffee_order;
 
 show tables;
 desc customers;
@@ -71,7 +71,7 @@ INSERT INTO customers (
     created_at,
     deleted
 ) VALUES (
-             'test9@example.com',
+             'test11@example.com',
              NOW(),
              FALSE
          );
@@ -86,7 +86,8 @@ INSERT INTO orders (
     created_at,
     deleted
 ) VALUES (
-             @customer_id,
+#              @customer_id,
+    11,
              'SHIPPING',
              '서울시 강남구',
              '12345',
