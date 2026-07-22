@@ -87,7 +87,6 @@ public class OrderService {
 
     // 문자열 조건은 trim 후 null로 정리하고, status는 타입 변환한다.
     // menuName이 있으면 삭제된 메뉴도 검색할 수 있도록 먼저 주문 id 목록을 구한 뒤 주문을 조회한다.
-    @Transactional(readOnly = true)
     public List<OrderGetResponse> getOrders(String email, String status, String menuName) {
         String trimmedEmail = (email == null || email.isBlank()) ? null : email.trim();
         String trimmedMenuName = (menuName == null || menuName.isBlank()) ? null : menuName.trim();
