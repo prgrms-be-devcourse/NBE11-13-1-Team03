@@ -59,7 +59,9 @@ public class OrderService {
                         new Order(customer, OrderStatus.ORDERED, request.getAddress(), request.getZipCode())));
 
         for (OrderItemRequest item : items) {
-            Menu menu = menuService.getMenuEntity(item.getMenuId());
+            //비관적 락으로 재고 차재
+            Menu menu = menuService.decreaseStockForOrder(item.getMenuId(), item.getQuantity());
+
             OrderItem orderItem = new OrderItem(order, menu, item.getQuantity(), menu.getPrice());
             order.addOrderItem(orderItem);
             orderItemRepository.save(orderItem);

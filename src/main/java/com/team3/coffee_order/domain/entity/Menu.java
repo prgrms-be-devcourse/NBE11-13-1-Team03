@@ -1,5 +1,6 @@
 package com.team3.coffee_order.domain.entity;
 
+import com.team3.coffee_order.exception.InvalidArgumentException;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import lombok.Getter;
@@ -50,6 +51,15 @@ public class Menu extends BaseEntity {
         this.price = price;
         this.stock = stock;
         this.description = description;
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    //상품 재고 차감
+    public void decreaseStock(int quantity){
+        if(this.stock<quantity){
+            throw new InvalidArgumentException("재고 부족: 재고 "+this.stock+"요청 "+quantity);
+        }
+        this.stock-=quantity;
         this.updatedAt = LocalDateTime.now();
     }
 }

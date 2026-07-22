@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 import java.util.Optional;
 
-public interface MenuRepository extends JpaRepository<Menu, Long> {
+public interface MenuRepository extends JpaRepository<Menu, Long> , MenuRepositoryCustom{
 
     // ===== 변경 전 (Menu의 @SQLRestriction("deleted = false")이 자동으로 처리해줬음) =====
     // boolean existsByName(String name);

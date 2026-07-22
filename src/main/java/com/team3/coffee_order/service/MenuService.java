@@ -31,6 +31,17 @@ public class MenuService {
                 .orElseThrow(() -> new NotFoundException("메뉴를 찾을 수 없습니다. menuId="+menuId));
     }
 
+    //주문 생성 시, 락을 걸고 재고 차감(비관적 락 적용)
+    @Transactional
+    public Menu decreaseStockForOrder(Long menuId, int quantity) {
+        Menu menu = menuRepository.findByIdForUpdate(menuId)
+                .orElseThrow(() -> new NotFoundException("메뉴를 찾을 수 없습니다. menuId=" + menuId));
+
+        menu.decreaseStock(quantity);
+
+        return menu;
+    }
+
     @Transactional
     public MenuResponse create(MenuCreateRequest request) {
         // 변경 전: if (menuRepository.existsByName(request.getName()))
