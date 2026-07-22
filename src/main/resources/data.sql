@@ -71,7 +71,7 @@ INSERT INTO customers (
     created_at,
     deleted
 ) VALUES (
-             'test9@example.com',
+             'test10@example.com',
              NOW(),
              FALSE
          );
@@ -86,7 +86,8 @@ INSERT INTO orders (
     created_at,
     deleted
 ) VALUES (
-             @customer_id,
+#              @customer_id,
+    10,
              'SHIPPING',
              '서울시 강남구',
              '12345',
