@@ -31,6 +31,7 @@ public class OrderService {
     private final OrderItemRepository orderItemRepository;
     private final CustomerService customerService;
     private final MenuService menuService;
+    private final EmailService emailService;
     private final OrderMapper orderMapper;
 
 
@@ -58,6 +59,9 @@ public class OrderService {
             order.addOrderItem(orderItem);
             orderItemRepository.save(orderItem);
         }
+
+        // 주문 완료 메일 보내기
+        emailService.sendOrderConfirmation(order);
 
         return orderMapper.toOrderCreateResponse(order);
     }
