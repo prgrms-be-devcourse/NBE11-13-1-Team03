@@ -1,7 +1,9 @@
 CREATE DATABASE coffee_order
     DEFAULT CHARACTER SET utf8mb4
     COLLATE utf8mb4_unicode_ci;
-
+select * from order_items;
+select * from orders;
+select * from menus;
 USE coffee_order;
 
 show tables;
