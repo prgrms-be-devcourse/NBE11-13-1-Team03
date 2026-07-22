@@ -32,13 +32,16 @@ public class AdminOrderController {
     public ResponseEntity<OrderGetResponse> getOrderById(@PathVariable Long orderId) {
         return ResponseEntity.status(HttpStatus.OK).body(orderService.getOrderAdmin(orderId));
     }
-
     // update
     @PatchMapping("/{orderId}/status")
     public ResponseEntity<OrderStatusResponse> updateOrderStatus(
             @PathVariable Long orderId,
             @Valid @RequestBody OrderStatusUpdateRequest request
     ) {
-        return orderService.updateOrderStatus(orderId, request);
+        OrderStatusResponse response = orderService.updateOrderStatus(orderId, request);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(response);
     }
 }
