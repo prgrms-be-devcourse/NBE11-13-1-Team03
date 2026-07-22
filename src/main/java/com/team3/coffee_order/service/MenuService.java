@@ -28,13 +28,15 @@ public class MenuService {
 
     // TODO: create
     public Menu getMenuEntity(Long menuId) {
-        return menuRepository.findById(menuId)
+        // 변경 전: return menuRepository.findById(menuId)
+        return menuRepository.findByIdAndDeletedFalse(menuId)
                 .orElseThrow(() -> new NotFoundException("메뉴를 찾을 수 없습니다. menuId="+menuId));
     }
 
     @Transactional
     public MenuResponse create(MenuCreateRequest request) {
-        if (menuRepository.existsByName(request.getName()))
+        // 변경 전: if (menuRepository.existsByName(request.getName()))
+        if (menuRepository.existsByNameAndDeletedFalse(request.getName()))
             throw new DuplicateMenuNameException("이미 존재하는 메뉴입니다.");
 
         String description = (request.getDescription() == null || request.getDescription().isBlank())
@@ -48,14 +50,16 @@ public class MenuService {
     // TODO: read
     // 응답 순서를 고정하기 위해 id 오름차순으로 조회한다.
     public List<MenuGetResponse> getMenus() {
-        return menuRepository.findAll(Sort.by(Sort.Direction.ASC, "id"))
+        // 변경 전: return menuRepository.findAll(Sort.by(Sort.Direction.ASC, "id"))
+        return menuRepository.findAllByDeletedFalse(Sort.by(Sort.Direction.ASC, "id"))
                 .stream()
                 .map(menuMapper::toMenuGetResponse)
                 .toList();
     }
 
     public MenuGetResponse getMenu(Long menuId) {
-        Menu menu = menuRepository.findById(menuId)
+        // 변경 전: Menu menu = menuRepository.findById(menuId)
+        Menu menu = menuRepository.findByIdAndDeletedFalse(menuId)
                 .orElseThrow(() -> new NotFoundException("메뉴를 찾을 수 없습니다. menuId=" + menuId));
 
         return menuMapper.toMenuGetResponse(menu);
@@ -65,7 +69,8 @@ public class MenuService {
     @Transactional
     public ResponseEntity<MenuResponse> updateMenu(Long menuId, MenuUpdateRequest request) {
         // 검증된 요청 값으로 메뉴를 조회하고, 엔티티 변경 메서드로 수정 결과를 반환한다.
-        Menu menu = menuRepository.findById(menuId)
+        // 변경 전: Menu menu = menuRepository.findById(menuId)
+        Menu menu = menuRepository.findByIdAndDeletedFalse(menuId)
                 .orElseThrow(() -> new NotFoundException("메뉴를 찾을 수 없습니다. menuId="+menuId));
 
         menu.update(request.getName(), request.getPrice(), request.getStock(), request.getDescription());
@@ -78,7 +83,8 @@ public class MenuService {
     // TODO: delete
     @Transactional
     public ResponseEntity<Void> deleteMenu(Long menuId){
-        Menu menu = menuRepository.findById(menuId)
+        // 변경 전: Menu menu = menuRepository.findById(menuId)
+        Menu menu = menuRepository.findByIdAndDeletedFalse(menuId)
                 .orElseThrow(()->  new NotFoundException("메뉴를 찾을 수 없습니다. menuId="+menuId));
 
         menuRepository.delete(menu);
