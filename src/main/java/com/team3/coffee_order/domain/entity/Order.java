@@ -4,7 +4,7 @@ import com.team3.coffee_order.exception.InvalidArgumentException;
 import jakarta.persistence.*;
 import lombok.Getter;
 import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.SQLRestriction;
+// import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -14,6 +14,8 @@ import java.util.List;
 @Getter
 @Table(name = "orders")
 @SQLDelete(sql = "UPDATE orders SET deleted = true, deleted_at = NOW() WHERE id = ?")
+// 팀 논의 후 제거: 조회 시 deleted=false 조건은 각 리포지토리 메서드에서 명시적으로 처리한다.
+// @SQLRestriction("deleted = false")
 public class Order extends BaseEntity {
 
     @Id

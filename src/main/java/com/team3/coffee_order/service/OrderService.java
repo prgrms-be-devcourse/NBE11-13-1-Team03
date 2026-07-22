@@ -47,7 +47,8 @@ public class OrderService {
                 : now.toLocalDate().plusDays(1).atTime(14, 0);
         LocalDateTime windowStart = windowEnd.minusDays(1);
 
-        Order order = orderRepository.findByCustomerAndCreatedAtBetween(customer, windowStart, windowEnd)
+        // 변경 전: orderRepository.findByCustomerAndCreatedAtBetween(customer, windowStart, windowEnd)
+        Order order = orderRepository.findByCustomerAndCreatedAtBetweenAndDeletedFalse(customer, windowStart, windowEnd)
                 .orElseGet(() -> orderRepository.save(
                         new Order(customer, OrderStatus.ORDERED, request.getAddress(), request.getZipCode())));
 
@@ -177,7 +178,8 @@ public class OrderService {
     @Transactional
     public OrderStatusResponse updateOrderStatus(Long orderId, OrderStatusUpdateRequest request) {
         // 검증된 요청 값으로 주문을 조회하고, 주문 상태만 변경해 결과를 반환한다.
-        Order order = orderRepository.findById(orderId)
+        // 변경 전: Order order = orderRepository.findById(orderId)
+        Order order = orderRepository.findByIdAndDeletedFalse(orderId)
                 .orElseThrow(() -> new NotFoundException("주문을 찾을 수 없습니다. orderId="+orderId));
 
         order.updateStatus(request.getStatus());
