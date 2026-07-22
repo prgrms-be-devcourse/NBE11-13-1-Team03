@@ -55,7 +55,7 @@ public class OrderService {
                         new Order(customer, OrderStatus.ORDERED, request.getAddress(), request.getZipCode())));
 
         for (OrderItemRequest item : items) {
-            //비관적 락으로 재고 차감
+            //비관적 락으로 재고 차재
             Menu menu = menuService.decreaseStockForOrder(item.getMenuId(), item.getQuantity());
 
             OrderItem orderItem = new OrderItem(order, menu, item.getQuantity(), menu.getPrice());
