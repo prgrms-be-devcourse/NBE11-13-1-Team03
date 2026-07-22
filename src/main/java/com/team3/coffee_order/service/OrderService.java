@@ -11,8 +11,6 @@ import com.team3.coffee_order.dto.order.*;
 import com.team3.coffee_order.exception.*;
 import com.team3.coffee_order.mapper.OrderMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -180,7 +178,7 @@ public class OrderService {
 
     // TODO: update
     @Transactional
-    public ResponseEntity<OrderStatusResponse> updateOrderStatus(Long orderId, OrderStatusUpdateRequest request) {
+    public OrderStatusResponse updateOrderStatus(Long orderId, OrderStatusUpdateRequest request) {
         // 검증된 요청 값으로 주문을 조회하고, 주문 상태만 변경해 결과를 반환한다.
         // 변경 전: Order order = orderRepository.findById(orderId)
         Order order = orderRepository.findByIdAndDeletedFalse(orderId)
@@ -188,14 +186,12 @@ public class OrderService {
 
         order.updateStatus(request.getStatus());
 
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(new OrderStatusResponse(order));
+        return new OrderStatusResponse(order);
     }
 
     // 배송 시작 전인 ORDERED 상태에서만 고객이 주문을 취소할 수 있다.
     @Transactional
-    public ResponseEntity<OrderStatusResponse> cancelOrder(Long orderId, String email) {
+    public OrderStatusResponse cancelOrder(Long orderId, String email) {
 
         if (email == null || email.isBlank()) {
             throw new InvalidArgumentException(
@@ -215,14 +211,12 @@ public class OrderService {
 
         order.updateStatus(OrderStatus.CANCELED);
 
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(new OrderStatusResponse(order));
+        return new OrderStatusResponse(order);
     }
 
     // 고객 주문의 배송지를 배송 시작 전에 변경한다.
     @Transactional
-    public ResponseEntity<OrderAddressResponse> updateShippingAddress(
+    public OrderAddressResponse updateShippingAddress(
             Long orderId,
             String email,
             OrderAddressUpdateRequest request
@@ -243,21 +237,16 @@ public class OrderService {
                 request.getZipCode().trim()
         );
 
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(new OrderAddressResponse(order));
+        return new OrderAddressResponse(order);
     }
 
 
     // TODO: delete
     @Transactional
-    public ResponseEntity<Void> deleteOrder(Long orderId) {
-        // 변경 전: Order order = orderRepository.findById(orderId)
-        Order order = orderRepository.findByIdAndDeletedFalse(orderId)
+    public void deleteOrder(Long orderId) {
+        Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new NotFoundException("주문을 찾을 수 없습니다. orderId=" + orderId));
 
         orderRepository.delete(order);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-
     }
 }

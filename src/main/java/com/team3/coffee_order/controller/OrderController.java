@@ -52,7 +52,11 @@ public class OrderController {
             @PathVariable Long orderId,
             @RequestParam String email
     ) {
-        return orderService.cancelOrder(orderId, email);
+        OrderStatusResponse response = orderService.cancelOrder(orderId, email);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(response);
     }
 
     @PatchMapping("/{orderId}/shipping-address")
@@ -61,12 +65,17 @@ public class OrderController {
             @RequestParam String email,
             @Valid @RequestBody OrderAddressUpdateRequest request
     ) {
-        return orderService.updateShippingAddress(orderId, email, request);
+        OrderAddressResponse response = orderService.updateShippingAddress(orderId, email, request);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(response);
     }
 
     // TODO: delete
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteOrder(@PathVariable Long id) {
-        return orderService.deleteOrder(id);
+        orderService.deleteOrder(id);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }
