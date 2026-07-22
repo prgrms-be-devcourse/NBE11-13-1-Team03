@@ -34,6 +34,7 @@ public class OrderService {
     private final OrderItemRepository orderItemRepository;
     private final CustomerService customerService;
     private final MenuService menuService;
+    private final EmailService emailService;
     private final OrderMapper orderMapper;
     private final DeliveredEventMapper deliveredEventMapper;
     private final ApplicationEventPublisher applicationEventPublisher;
@@ -52,7 +53,8 @@ public class OrderService {
                 : now.toLocalDate().plusDays(1).atTime(14, 0);
         LocalDateTime windowStart = windowEnd.minusDays(1);
 
-        Order order = orderRepository.findByCustomerAndCreatedAtBetween(customer, windowStart, windowEnd)
+        // 변경 전: orderRepository.findByCustomerAndCreatedAtBetween(customer, windowStart, windowEnd)
+        Order order = orderRepository.findByCustomerAndCreatedAtBetweenAndDeletedFalse(customer, windowStart, windowEnd)
                 .orElseGet(() -> orderRepository.save(
                         new Order(customer, OrderStatus.ORDERED, request.getAddress(), request.getZipCode())));
 
@@ -62,6 +64,9 @@ public class OrderService {
             order.addOrderItem(orderItem);
             orderItemRepository.save(orderItem);
         }
+
+        // 주문 완료 메일 보내기
+        emailService.sendOrderConfirmation(order);
 
         return orderMapper.toOrderCreateResponse(order);
     }
@@ -87,7 +92,6 @@ public class OrderService {
 
     // 문자열 조건은 trim 후 null로 정리하고, status는 타입 변환한다.
     // menuName이 있으면 삭제된 메뉴도 검색할 수 있도록 먼저 주문 id 목록을 구한 뒤 주문을 조회한다.
-    @Transactional(readOnly = true)
     public List<OrderGetResponse> getOrders(String email, String status, String menuName) {
         String trimmedEmail = (email == null || email.isBlank()) ? null : email.trim();
         String trimmedMenuName = (menuName == null || menuName.isBlank()) ? null : menuName.trim();
@@ -182,7 +186,8 @@ public class OrderService {
     @Transactional
     public OrderStatusResponse updateOrderStatus(Long orderId, OrderStatusUpdateRequest request) {
         // 검증된 요청 값으로 주문을 조회하고, 주문 상태만 변경해 결과를 반환한다.
-        Order order = orderRepository.findById(orderId)
+        // 변경 전: Order order = orderRepository.findById(orderId)
+        Order order = orderRepository.findByIdAndDeletedFalse(orderId)
                 .orElseThrow(() -> new NotFoundException("주문을 찾을 수 없습니다. orderId="+orderId));
 
         OrderStatus nextStatus = request.getStatus();

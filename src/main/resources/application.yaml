@@ -1,9 +1,9 @@
 spring:
   application:
-    name: basic-board
+    name: coffee-order
 
   datasource:
-    url: jdbc:mysql://localhost:3306/coffee?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://localhost:3306/coffee_order?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8&allowPublicKeyRetrieval=true
     username: root
     password: ${DB_PASSWORD}
 
@@ -17,6 +17,18 @@ spring:
     properties:
       hibernate:
         format_sql: true
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 
 # logging.level = "어느 패키지의 로그를 어느 레벨부터 보여줄지" 정하는 스위치
 # 패키지별로 다르게 줄 수 있음
@@ -37,8 +49,6 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
 
-file:
-  upload-dir: ./uploads
 
 slack:
   webhook-url: ${SLACK_WEBHOOK_URL}
