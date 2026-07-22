@@ -3,7 +3,7 @@ spring:
     name: coffee-order
 
   datasource:
-    url: jdbc:mysql://localhost:3306/coffee?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://localhost:3306/coffee_order?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8&allowPublicKeyRetrieval=true
     username: root
     password: ${DB_PASSWORD}
 
