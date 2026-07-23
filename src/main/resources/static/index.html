@@ -7,6 +7,7 @@
   <title>Grids & Circle · Live Demo</title>
   <link rel="stylesheet" href="/css/demo.css">
   <link rel="stylesheet" href="/css/audience.css">
+  <script src="//t1.kakaocdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 </head>
 <body>
   <div class="connection-bar" id="connectionBar" role="status">
@@ -53,8 +54,14 @@
           <div id="cartEmpty" class="cart-empty"><span>☕</span><b>메뉴를 선택해 주세요</b><small>수량은 재고 범위 안에서 조절할 수 있습니다.</small></div>
           <form id="orderForm" class="form-stack">
             <label>이메일<input id="orderEmail" type="email" placeholder="customer@example.com" required></label>
-            <label>배송 주소<input id="orderAddress" placeholder="서울시 성동구 성수이로 12" required></label>
-            <label>우편번호<input id="orderZip" placeholder="04783" required></label>
+            <label>우편번호
+              <div class="address-search-row">
+                <input id="orderZip" placeholder="04783" required readonly>
+                <button type="button" class="soft-button" id="searchAddress">주소 검색</button>
+              </div>
+            </label>
+            <label>배송 주소<input id="orderAddress" placeholder="주소 검색을 눌러주세요" required readonly></label>
+            <label>상세 주소<input id="orderAddressDetail" placeholder="동/호수 등 상세주소"></label>
             <div class="total-line"><span>총 주문 금액</span><strong id="cartTotal">0원</strong></div>
             <button class="primary-button api-action" id="submitOrder" type="submit"><span>주문하기</span><small>선택한 내용을 확인해 주세요</small></button>
             <p class="warning-copy">주문이 완료되면 입력한 이메일로 주문 내역을 보내드려요.</p>
@@ -84,7 +91,6 @@
 
     <section class="screen" id="raceScreen">
       <div class="page-title"><div><p class="kicker">CONCURRENCY LAB</p><h1>동시 주문 시각화</h1><p>여러 실제 주문 요청을 동시에 보내 비관적 잠금과 재고 정합성을 확인합니다.</p></div></div>
-      <div class="race-warning"><b>⚠ 실제 요청을 전송합니다.</b><span>각 성공 요청은 DB에 저장되고 메일 발송 로직도 실행됩니다. 발표 전 테스트 계정 설정을 확인하세요.</span></div>
       <div class="race-layout">
         <form class="race-controls" id="raceForm">
           <label>실험 메뉴<select id="raceMenu" required></select></label>
@@ -109,7 +115,24 @@
 
   <dialog id="menuDialog"><form id="menuForm" class="modal-form"><div class="modal-head"><div><p class="kicker">MENU EDITOR</p><h2 id="menuModalTitle">메뉴 등록</h2></div><button type="button" class="close-button" data-close>×</button></div><input id="menuId" type="hidden"><label>메뉴 이름<input id="menuName" required></label><div class="field-pair"><label>가격<input id="menuPrice" type="number" min="0" required></label><label>재고<input id="menuStock" type="number" min="0" required></label></div><label>설명<textarea id="menuDescription" rows="3"></textarea></label><button class="primary-button api-action" type="submit"><span>서버에 저장</span><small id="menuApiHint">POST /api/menus</small></button></form></dialog>
   <dialog id="orderDialog"><div class="modal-form wide"><div class="modal-head"><div><p class="kicker">ORDER DETAIL</p><h2 id="orderModalTitle">주문 상세</h2></div><button type="button" class="close-button" data-close>×</button></div><div id="orderModalBody"></div></div></dialog>
-  <dialog id="addressDialog"><form id="addressForm" class="modal-form"><div class="modal-head"><div><p class="kicker">SHIPPING ADDRESS</p><h2>배송지 변경</h2></div><button type="button" class="close-button" data-close>×</button></div><input id="addressOrderId" type="hidden"><input id="addressEmail" type="hidden"><label>주소<input id="newAddress" required></label><label>우편번호<input id="newZip" required></label><button class="primary-button api-action" type="submit"><span>변경 내용 저장</span><small>배송 시작 전까지 변경할 수 있어요</small></button></form></dialog>
+  <dialog id="addressDialog">
+    <form id="addressForm" class="modal-form">
+      <div class="modal-head">
+        <div><p class="kicker">SHIPPING ADDRESS</p><h2>배송지 변경</h2></div>
+        <button type="button" class="close-button" data-close>×</button>
+      </div>
+      <input id="addressOrderId" type="hidden">
+      <input id="addressEmail" type="hidden">
+      <label>우편번호
+        <div class="address-search-row">
+          <input id="newZip" required readonly>
+          <button type="button" class="soft-button" id="searchAddressModal">주소 검색</button>
+        </div>
+      </label>
+      <label>주소<input id="newAddress" required></label>
+      <button class="primary-button api-action" type="submit"><span>변경 내용 저장</span><small>배송 시작 전까지 변경할 수 있어요</small></button>
+    </form>
+  </dialog>
   <dialog id="confirmDialog"><form method="dialog" class="modal-form"><div class="modal-head"><h2 id="confirmTitle">확인</h2><button value="cancel" class="close-button">×</button></div><p id="confirmMessage" class="confirm-message"></p><div class="confirm-actions"><button value="cancel" class="soft-button">돌아가기</button><button value="confirm" class="danger-button" id="confirmAction">진행</button></div></form></dialog>
 
   <div class="toast-stack" id="toasts" aria-live="polite"></div>

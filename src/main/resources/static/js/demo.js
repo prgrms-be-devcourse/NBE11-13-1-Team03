@@ -42,7 +42,47 @@ $('#refreshMenus').onclick=async()=>{try{await loadMenus();toast('최신 재고�
 function addCart(id){const menu=state.menus.find(m=>m.menuId===id);const current=state.cart.get(id)||0;if(current>=menu.stock)return toast('현재 재고보다 많이 담을 수 없습니다.','error');state.cart.set(id,current+1);renderCart()}
 function renderCart(){const rows=[...state.cart.entries()].filter(([id])=>state.menus.some(m=>m.menuId===id));$('#cartEmpty').hidden=rows.length>0;$('#cartRows').innerHTML=rows.map(([id,quantity])=>{const menu=state.menus.find(m=>m.menuId===id);return `<div class="cart-row"><div><b>${escapeHtml(menu.name)}</b><small>${won(menu.price*quantity)}</small></div><div class="quantity"><button data-cart-id="${id}" data-delta="-1">−</button><span>${quantity}</span><button data-cart-id="${id}" data-delta="1">＋</button></div><button class="remove-button" data-remove-id="${id}">×</button></div>`}).join('');const count=rows.reduce((sum,[,q])=>sum+q,0);const total=rows.reduce((sum,[id,q])=>sum+state.menus.find(m=>m.menuId===id).price*q,0);$('#cartBadge').textContent=count;$('#cartTotal').textContent=won(total);$$('[data-cart-id]').forEach(button=>button.onclick=()=>{const id=Number(button.dataset.cartId),next=(state.cart.get(id)||0)+Number(button.dataset.delta),menu=state.menus.find(m=>m.menuId===id);if(next<=0)state.cart.delete(id);else if(next<=menu.stock)state.cart.set(id,next);else toast('현재 재고보다 많이 담을 수 없습니다.','error');renderCart()});$$('[data-remove-id]').forEach(button=>button.onclick=()=>{state.cart.delete(Number(button.dataset.removeId));renderCart()})}
 
-$('#orderForm').onsubmit=async event=>{event.preventDefault();if(!state.cart.size)return toast('주문할 메뉴를 선택해 주세요.','error');const payload={email:$('#orderEmail').value.trim(),address:$('#orderAddress').value.trim(),zipCode:$('#orderZip').value.trim(),items:[...state.cart].map(([menuId,quantity])=>({menuId,quantity}))};setBusy(true);try{const result=await request('/api/orders',{method:'POST',body:JSON.stringify(payload)});$('#orderResult').hidden=false;$('#orderResult').innerHTML=`<p class="kicker">ORDER COMPLETE</p><h3>주문이 완료되었어요!</h3><p>주문번호는 <b>#${result.orderId}</b>입니다. 입력하신 이메일로 주문 내역을 보내드리며, 위 ‘주문 추적’에서 배송 현황도 확인할 수 있어요.</p><div class="result-items">${result.items.map(i=>`<span>${escapeHtml(i.menuName)} · ${i.quantity}개 · ${won(i.unitPrice*i.quantity)}</span>`).join('')}<span>총 결제 금액 ${won(result.totalAmount)}</span></div>`;state.cart.clear();renderCart();await loadMenus();$('#historyEmail').value=payload.email;toast('주문이 완료되었어요.');$('#orderResult').scrollIntoView({behavior:'smooth'})}catch(error){toast(`주문을 완료하지 못했어요 · ${error.message}`,'error');$('#orderResult').hidden=false;showError('#orderResult',error,'주문을 완료하지 못했어요.')}finally{setBusy(false)}};
+/* ── 카카오(다음) 주소검색 ───────────────────────────────
+   도로명주소 + 참고항목을 orderAddress에 채워 넣고,
+   상세주소는 사용자가 별도로 입력한 뒤 제출 시 하나로 합친다. */
+function execAddressSearch(zipInputId, addressInputId, focusNextId){
+  new daum.Postcode({
+    oncomplete:function(data){
+      const extra=[];
+      if(data.bname&&/[동로가]$/.test(data.bname))extra.push(data.bname);
+      if(data.buildingName&&data.apartment==='Y')extra.push(data.buildingName);
+      const roadAddr=data.roadAddress+(extra.length?` (${extra.join(', ')})`:'');
+      $(`#${zipInputId}`).value=data.zonecode;
+      $(`#${addressInputId}`).value=roadAddr;
+      if(focusNextId)$(`#${focusNextId}`).focus();
+    }
+  }).open();
+}
+$('#searchAddress').onclick=()=>execAddressSearch('orderZip','orderAddress','orderAddressDetail');
+$('#searchAddressModal').onclick=()=>execAddressSearch('newZip','newAddress');
+
+$('#orderForm').onsubmit=async event=>{
+  event.preventDefault();
+  if(!state.cart.size)return toast('주문할 메뉴를 선택해 주세요.','error');
+  const fullAddress=[$('#orderAddress').value.trim(),$('#orderAddressDetail').value.trim()].filter(Boolean).join(' ');
+  if(!fullAddress)return toast('주소 검색 후 상세주소까지 입력해 주세요.','error');
+  const payload={email:$('#orderEmail').value.trim(),address:fullAddress,zipCode:$('#orderZip').value.trim(),items:[...state.cart].map(([menuId,quantity])=>({menuId,quantity}))};
+  setBusy(true);
+  try{
+    const result=await request('/api/orders',{method:'POST',body:JSON.stringify(payload)});
+    $('#orderResult').hidden=false;
+    $('#orderResult').innerHTML=`<p class="kicker">ORDER COMPLETE</p><h3>주문이 완료되었어요!</h3><p>주문번호는 <b>#${result.orderId}</b>입니다. 입력하신 이메일로 주문 내역을 보내드리며, 위 ‘주문 추적’에서 배송 현황도 확인할 수 있어요.</p><div class="result-items">${result.items.map(i=>`<span>${escapeHtml(i.menuName)} · ${i.quantity}개 · ${won(i.unitPrice*i.quantity)}</span>`).join('')}<span>총 결제 금액 ${won(result.totalAmount)}</span></div>`;
+    state.cart.clear();renderCart();await loadMenus();
+    $('#historyEmail').value=payload.email;
+    toast('주문이 완료되었어요.');
+    $('#orderResult').scrollIntoView({behavior:'smooth'});
+    $('#orderAddress').value='';$('#orderZip').value='';$('#orderAddressDetail').value='';
+  }catch(error){
+    toast(`주문을 완료하지 못했어요 · ${error.message}`,'error');
+    $('#orderResult').hidden=false;
+    showError('#orderResult',error,'주문을 완료하지 못했어요.');
+  }finally{setBusy(false)}
+};
 
 $('#historySearch').onsubmit=event=>{event.preventDefault();loadHistory($('#historyEmail').value.trim())};
 async function loadHistory(email){$('#historyState').innerHTML='<div class="state-panel"><b>주문 내역을 찾고 있어요.</b><span>잠시만 기다려 주세요.</span></div>';$('#historyList').innerHTML='';setBusy(true);try{const orders=await request(`/api/orders?email=${encodeURIComponent(email)}`);$('#historyState').innerHTML=orders.length?'':'<div class="state-panel"><b>주문 내역을 찾지 못했어요.</b><span>주문할 때 입력한 이메일이 맞는지 확인해 주세요.</span></div>';renderHistory(orders)}catch(error){showError('#historyState',error,'주문 내역을 불러오지 못했어요.')}finally{setBusy(false)}}
