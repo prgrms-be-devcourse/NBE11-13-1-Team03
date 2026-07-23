@@ -1,0 +1,48 @@
+/* Readable presentation UI for customer-facing demo screens. */
+.connection-bar {
+  min-height: 38px;
+  padding: 8px max(24px, 4vw);
+  gap: 9px;
+  font-size: 13px;
+}
+
+.connection-bar strong {
+  font-size: 13px;
+}
+
+.site-header {
+  height: 86px;
+}
+
+.nav-item {
+  padding-right: 25px;
+  padding-left: 25px;
+  font-size: 15px;
+  font-weight: 750;
+  letter-spacing: -.2px;
+}
+
+.nav-item.active::after {
+  right: 25px;
+  left: 25px;
+  height: 4px;
+}
+
+.live-chip {
+  font-size: 13px;
+  font-weight: 800;
+}
+
+@media (max-width: 1040px) {
+  .nav-item {
+    padding-right: 16px;
+    padding-left: 16px;
+    font-size: 14px;
+  }
+
+  .nav-item.active::after {
+    right: 16px;
+    left: 16px;
+  }
+}
+

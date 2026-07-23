@@ -3,16 +3,17 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Grids & Circle 실제 API 연동 커피 주문 시연 콘솔">
+  <meta name="description" content="Grids & Circle 커피 주문 및 배송 조회 서비스">
   <title>Grids & Circle · Live Demo</title>
   <link rel="stylesheet" href="/css/demo.css">
+  <link rel="stylesheet" href="/css/audience.css">
 </head>
 <body>
   <div class="connection-bar" id="connectionBar" role="status">
     <span class="connection-dot"></span>
-    <strong id="connectionTitle">백엔드 연결 확인 중</strong>
-    <span id="connectionDetail">GET /api/menus 요청을 보내고 있습니다.</span>
-    <button id="retryConnection" class="link-button" hidden>다시 연결</button>
+    <strong id="connectionTitle">서비스를 준비하고 있어요</strong>
+    <span id="connectionDetail">잠시만 기다려 주세요.</span>
+    <button id="retryConnection" class="link-button" hidden>다시 시도</button>
   </div>
 
   <header class="site-header">
@@ -26,18 +27,18 @@
       <button class="nav-item" data-route="admin">운영 관리</button>
       <button class="nav-item" data-route="race">동시 주문 실험</button>
     </nav>
-    <div class="live-chip"><span></span> 실제 API</div>
+    <div class="live-chip"><span></span> 주문 가능</div>
   </header>
 
   <main>
     <section class="screen active" id="orderScreen">
       <div class="hero">
         <div>
-          <p class="kicker">TODAY'S COFFEE · LIVE INVENTORY</p>
-          <h1>주문부터 재고까지,<br><em>실제로 움직입니다.</em></h1>
-          <p>표시되는 메뉴와 재고는 현재 Spring Boot API에서 조회한 값입니다.</p>
+          <p class="kicker">TODAY'S COFFEE</p>
+          <h1>오늘의 커피를 고르고,<br><em>간편하게 주문하세요.</em></h1>
+          <p>지금 주문할 수 있는 메뉴와 남은 수량을 한눈에 확인해 보세요.</p>
         </div>
-        <div class="hero-proof"><span>현재 데이터 출처</span><strong>GET /api/menus</strong><small>새로고침할 때마다 서버의 최신 상태를 반영합니다.</small></div>
+        <div class="hero-proof"><span>오늘의 안내</span><strong>신선한 메뉴를 준비했어요</strong><small>남은 수량은 새로고침할 때마다 최신 정보로 표시됩니다.</small></div>
       </div>
       <div class="order-layout">
         <section>
@@ -55,8 +56,8 @@
             <label>배송 주소<input id="orderAddress" placeholder="서울시 성동구 성수이로 12" required></label>
             <label>우편번호<input id="orderZip" placeholder="04783" required></label>
             <div class="total-line"><span>총 주문 금액</span><strong id="cartTotal">0원</strong></div>
-            <button class="primary-button api-action" id="submitOrder" type="submit"><span>실제 주문 생성</span><small>POST /api/orders</small></button>
-            <p class="warning-copy">실제 DB에 주문이 저장되고 메일 발송 로직이 실행됩니다.</p>
+            <button class="primary-button api-action" id="submitOrder" type="submit"><span>주문하기</span><small>선택한 내용을 확인해 주세요</small></button>
+            <p class="warning-copy">주문이 완료되면 입력한 이메일로 주문 내역을 보내드려요.</p>
           </form>
         </aside>
       </div>
@@ -64,8 +65,8 @@
     </section>
 
     <section class="screen" id="historyScreen">
-      <div class="page-title"><div><p class="kicker">CUSTOMER JOURNEY</p><h1>내 주문 추적</h1><p>이메일로 실제 주문을 조회하고 배송 전 변경을 처리합니다.</p></div><div class="step-legend"><span>1 주문 접수</span><i></i><span>2 배송 중</span><i></i><span>3 배송 완료</span></div></div>
-      <form class="search-panel" id="historySearch"><label><span>주문 이메일</span><input id="historyEmail" type="email" placeholder="customer@example.com" required></label><button class="dark-button api-action" type="submit">실제 주문 조회</button></form>
+      <div class="page-title"><div><p class="kicker">CUSTOMER JOURNEY</p><h1>내 주문 추적</h1><p>주문할 때 입력한 이메일로 배송 현황을 확인하고 배송지를 변경할 수 있어요.</p></div><div class="step-legend"><span>1 주문 접수</span><i></i><span>2 배송 중</span><i></i><span>3 배송 완료</span></div></div>
+      <form class="search-panel" id="historySearch"><label><span>주문 이메일</span><input id="historyEmail" type="email" placeholder="주문할 때 입력한 이메일" required></label><button class="dark-button api-action" type="submit">내 주문 확인</button></form>
       <div id="historyState"></div>
       <div id="historyList" class="order-list"></div>
     </section>
@@ -108,7 +109,7 @@
 
   <dialog id="menuDialog"><form id="menuForm" class="modal-form"><div class="modal-head"><div><p class="kicker">MENU EDITOR</p><h2 id="menuModalTitle">메뉴 등록</h2></div><button type="button" class="close-button" data-close>×</button></div><input id="menuId" type="hidden"><label>메뉴 이름<input id="menuName" required></label><div class="field-pair"><label>가격<input id="menuPrice" type="number" min="0" required></label><label>재고<input id="menuStock" type="number" min="0" required></label></div><label>설명<textarea id="menuDescription" rows="3"></textarea></label><button class="primary-button api-action" type="submit"><span>서버에 저장</span><small id="menuApiHint">POST /api/menus</small></button></form></dialog>
   <dialog id="orderDialog"><div class="modal-form wide"><div class="modal-head"><div><p class="kicker">ORDER DETAIL</p><h2 id="orderModalTitle">주문 상세</h2></div><button type="button" class="close-button" data-close>×</button></div><div id="orderModalBody"></div></div></dialog>
-  <dialog id="addressDialog"><form id="addressForm" class="modal-form"><div class="modal-head"><div><p class="kicker">SHIPPING ADDRESS</p><h2>배송지 변경</h2></div><button type="button" class="close-button" data-close>×</button></div><input id="addressOrderId" type="hidden"><input id="addressEmail" type="hidden"><label>주소<input id="newAddress" required></label><label>우편번호<input id="newZip" required></label><button class="primary-button api-action" type="submit"><span>실제 배송지 변경</span><small>PATCH /api/orders/{id}/shipping-address</small></button></form></dialog>
+  <dialog id="addressDialog"><form id="addressForm" class="modal-form"><div class="modal-head"><div><p class="kicker">SHIPPING ADDRESS</p><h2>배송지 변경</h2></div><button type="button" class="close-button" data-close>×</button></div><input id="addressOrderId" type="hidden"><input id="addressEmail" type="hidden"><label>주소<input id="newAddress" required></label><label>우편번호<input id="newZip" required></label><button class="primary-button api-action" type="submit"><span>변경 내용 저장</span><small>배송 시작 전까지 변경할 수 있어요</small></button></form></dialog>
   <dialog id="confirmDialog"><form method="dialog" class="modal-form"><div class="modal-head"><h2 id="confirmTitle">확인</h2><button value="cancel" class="close-button">×</button></div><p id="confirmMessage" class="confirm-message"></p><div class="confirm-actions"><button value="cancel" class="soft-button">돌아가기</button><button value="confirm" class="danger-button" id="confirmAction">진행</button></div></form></dialog>
 
   <div class="toast-stack" id="toasts" aria-live="polite"></div>
