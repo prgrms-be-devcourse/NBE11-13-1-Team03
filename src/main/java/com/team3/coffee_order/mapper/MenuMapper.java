@@ -12,7 +12,8 @@ public class MenuMapper {
                 menu.getName(),
                 menu.getPrice(),
                 menu.getStock(),
-                menu.getDescription()
+                menu.getDescription(),
+                menu.getImageUrl()
         );
     }
 }

@@ -51,7 +51,12 @@ public class MenuService {
         String description = (request.getDescription() == null || request.getDescription().isBlank())
                 ? null
                 : request.getDescription();
-        Menu menu = new Menu(request.getName(), request.getPrice(), request.getStock(), description);
+
+        String imageUrl = (request.getImageUrl() == null || request.getImageUrl().isBlank())
+                ? null
+                : request.getImageUrl();
+
+        Menu menu = new Menu(request.getName(), request.getPrice(), request.getStock(), description, imageUrl);
 
         return new MenuResponse(menuRepository.save(menu));
     }
@@ -79,10 +84,14 @@ public class MenuService {
     public MenuResponse updateMenu(Long menuId, MenuUpdateRequest request) {
         // 검증된 요청 값으로 메뉴를 조회하고, 엔티티 변경 메서드로 수정 결과를 반환한다.
         // 변경 전: Menu menu = menuRepository.findById(menuId)
+        String imageUrl = request.getImageUrl() == null || request.getImageUrl().isBlank()
+                        ? null
+                        : request.getImageUrl();
+
         Menu menu = menuRepository.findByIdAndDeletedFalse(menuId)
                 .orElseThrow(() -> new NotFoundException("메뉴를 찾을 수 없습니다. menuId="+menuId));
 
-        menu.update(request.getName(), request.getPrice(), request.getStock(), request.getDescription());
+        menu.update(request.getName(), request.getPrice(), request.getStock(), request.getDescription(), imageUrl);
 
         return new MenuResponse(menu);
     }

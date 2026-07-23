@@ -25,4 +25,6 @@ public class MenuCreateRequest {
     private Integer stock;
 
     private String description;
+
+    private String imageUrl;
 }

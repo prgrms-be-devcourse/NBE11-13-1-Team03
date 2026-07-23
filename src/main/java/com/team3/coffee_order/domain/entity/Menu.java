@@ -30,27 +30,33 @@ public class Menu extends BaseEntity {
 
     private String description;
 
+    @Column(length = 500)
+    private String imageUrl;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
 
+
     protected Menu() {}
 
-    public Menu(String name, Integer price, Integer stock, String description) {
+    public Menu(String name, Integer price, Integer stock, String description, String imageUrl) {
         this.name = name;
         this.price = price;
         this.stock = stock;
         this.description = description;
+        this.imageUrl = imageUrl;
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }
 
-    public void update(String name, Integer price, Integer stock, String description) {
+    public void update(String name, Integer price, Integer stock, String description, String imageUrl) {
         this.name = name;
         this.price = price;
         this.stock = stock;
         this.description = description;
+        this.imageUrl = imageUrl;
         this.updatedAt = LocalDateTime.now();
     }
 
