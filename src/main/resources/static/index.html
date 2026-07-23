@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Grids & Circle 실제 API 연동 커피 주문 시연 콘솔">
+  <title>Grids & Circle · Live Demo</title>
+  <link rel="stylesheet" href="/css/demo.css">
+</head>
+<body>
+  <div class="connection-bar" id="connectionBar" role="status">
+    <span class="connection-dot"></span>
+    <strong id="connectionTitle">백엔드 연결 확인 중</strong>
+    <span id="connectionDetail">GET /api/menus 요청을 보내고 있습니다.</span>
+    <button id="retryConnection" class="link-button" hidden>다시 연결</button>
+  </div>
+
+  <header class="site-header">
+    <a class="brand" href="#order" data-route="order" aria-label="주문 화면으로 이동">
+      <span class="brand-symbol">G<span>●</span>C</span>
+      <span><b>GRIDS & CIRCLE</b><small>LIVE COFFEE ORDER</small></span>
+    </a>
+    <nav class="main-nav" aria-label="시연 화면">
+      <button class="nav-item active" data-route="order">고객 주문</button>
+      <button class="nav-item" data-route="history">주문 추적</button>
+      <button class="nav-item" data-route="admin">운영 관리</button>
+      <button class="nav-item" data-route="race">동시 주문 실험</button>
+    </nav>
+    <div class="live-chip"><span></span> 실제 API</div>
+  </header>
+
+  <main>
+    <section class="screen active" id="orderScreen">
+      <div class="hero">
+        <div>
+          <p class="kicker">TODAY'S COFFEE · LIVE INVENTORY</p>
+          <h1>주문부터 재고까지,<br><em>실제로 움직입니다.</em></h1>
+          <p>표시되는 메뉴와 재고는 현재 Spring Boot API에서 조회한 값입니다.</p>
+        </div>
+        <div class="hero-proof"><span>현재 데이터 출처</span><strong>GET /api/menus</strong><small>새로고침할 때마다 서버의 최신 상태를 반영합니다.</small></div>
+      </div>
+      <div class="order-layout">
+        <section>
+          <div class="section-head"><div><p class="kicker">LIVE MENU</p><h2>오늘의 원두</h2></div><button class="soft-button" id="refreshMenus">↻ 재고 새로고침</button></div>
+          <div class="loading-grid" id="menuLoading"><i></i><i></i><i></i><i></i></div>
+          <div class="menu-grid" id="menuGrid"></div>
+          <div class="empty-panel" id="menuEmpty" hidden><b>등록된 메뉴가 없습니다.</b><span>운영 관리 → 메뉴 관리에서 실제 메뉴를 먼저 등록해 주세요.</span><button data-route="admin" class="dark-button">메뉴 등록하러 가기</button></div>
+        </section>
+        <aside class="order-sheet">
+          <div class="sheet-title"><div><p class="kicker">YOUR ORDER</p><h2>주문서</h2></div><span id="cartBadge">0</span></div>
+          <div id="cartRows" class="cart-rows"></div>
+          <div id="cartEmpty" class="cart-empty"><span>☕</span><b>메뉴를 선택해 주세요</b><small>수량은 재고 범위 안에서 조절할 수 있습니다.</small></div>
+          <form id="orderForm" class="form-stack">
+            <label>이메일<input id="orderEmail" type="email" placeholder="customer@example.com" required></label>
+            <label>배송 주소<input id="orderAddress" placeholder="서울시 성동구 성수이로 12" required></label>
+            <label>우편번호<input id="orderZip" placeholder="04783" required></label>
+            <div class="total-line"><span>총 주문 금액</span><strong id="cartTotal">0원</strong></div>
+            <button class="primary-button api-action" id="submitOrder" type="submit"><span>실제 주문 생성</span><small>POST /api/orders</small></button>
+            <p class="warning-copy">실제 DB에 주문이 저장되고 메일 발송 로직이 실행됩니다.</p>
+          </form>
+        </aside>
+      </div>
+      <section class="result-panel" id="orderResult" hidden></section>
+    </section>
+
+    <section class="screen" id="historyScreen">
+      <div class="page-title"><div><p class="kicker">CUSTOMER JOURNEY</p><h1>내 주문 추적</h1><p>이메일로 실제 주문을 조회하고 배송 전 변경을 처리합니다.</p></div><div class="step-legend"><span>1 주문 접수</span><i></i><span>2 배송 중</span><i></i><span>3 배송 완료</span></div></div>
+      <form class="search-panel" id="historySearch"><label><span>주문 이메일</span><input id="historyEmail" type="email" placeholder="customer@example.com" required></label><button class="dark-button api-action" type="submit">실제 주문 조회</button></form>
+      <div id="historyState"></div>
+      <div id="historyList" class="order-list"></div>
+    </section>
+
+    <section class="screen" id="adminScreen">
+      <div class="page-title"><div><p class="kicker">OPERATIONS CENTER</p><h1>운영 관리</h1><p>전체 주문과 메뉴 재고를 실제 서버 기준으로 관리합니다.</p></div><button class="primary-button compact api-action" id="newMenuButton">＋ 새 메뉴 등록</button></div>
+      <div class="metric-grid" id="metrics"><div class="metric skeleton"></div><div class="metric skeleton"></div><div class="metric skeleton"></div><div class="metric skeleton"></div></div>
+      <div class="sub-tabs"><button class="sub-tab active" data-admin-tab="orders">주문 관리</button><button class="sub-tab" data-admin-tab="menus">메뉴 관리</button></div>
+      <section class="admin-pane active" id="adminOrdersPane">
+        <form class="filter-bar" id="adminFilters"><input id="adminEmail" placeholder="이메일"><select id="adminStatus"><option value="">전체 상태</option><option value="ORDERED">주문 접수</option><option value="SHIPPING">배송 중</option><option value="DELIVERED">배송 완료</option><option value="CANCELED">취소</option></select><input id="adminMenu" placeholder="메뉴명"><button class="dark-button api-action" type="submit">검색</button><button class="soft-button" id="clearFilters" type="button">초기화</button></form>
+        <div id="adminOrders" class="data-table-wrap"></div>
+      </section>
+      <section class="admin-pane" id="adminMenusPane"><div id="adminMenus" class="data-table-wrap"></div></section>
+    </section>
+
+    <section class="screen" id="raceScreen">
+      <div class="page-title"><div><p class="kicker">CONCURRENCY LAB</p><h1>동시 주문 시각화</h1><p>여러 실제 주문 요청을 동시에 보내 비관적 잠금과 재고 정합성을 확인합니다.</p></div></div>
+      <div class="race-warning"><b>⚠ 실제 요청을 전송합니다.</b><span>각 성공 요청은 DB에 저장되고 메일 발송 로직도 실행됩니다. 발표 전 테스트 계정 설정을 확인하세요.</span></div>
+      <div class="race-layout">
+        <form class="race-controls" id="raceForm">
+          <label>실험 메뉴<select id="raceMenu" required></select></label>
+          <div class="stock-readout"><span>현재 실제 재고</span><strong id="raceStock">—</strong></div>
+          <div class="field-pair"><label>동시 요청 수<input id="raceRequests" type="number" min="2" max="30" value="10" required></label><label>요청당 수량<input id="raceQuantity" type="number" min="1" value="1" required></label></div>
+          <label>수신 Gmail 주소<input id="raceEmail" type="email" placeholder="yourname@gmail.com" required><small>각 요청은 Gmail +별칭으로 분리되며 모두 같은 받은편지함으로 전달됩니다.</small></label>
+          <label>배송 주소<input id="raceAddress" value="서울시 성동구 동시성로 10" required></label>
+          <label>우편번호<input id="raceZip" value="04783" required></label>
+          <div class="race-estimate" id="raceEstimate"></div>
+          <button class="primary-button api-action" id="runRace" type="submit"><span>동시 주문 실행</span><small>Promise.allSettled · POST /api/orders</small></button>
+        </form>
+        <div class="race-stage">
+          <div class="race-before-after"><div><span>실험 전 재고</span><strong id="beforeStock">—</strong></div><div class="flow-arrow">→</div><div><span>실험 후 재고</span><strong id="afterStock">—</strong></div></div>
+          <div class="request-grid" id="requestGrid"><div class="race-placeholder">실험을 실행하면 각 요청의 성공·실패 결과가 여기에 표시됩니다.</div></div>
+          <div class="race-summary" id="raceSummary" hidden></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <dialog id="menuDialog"><form id="menuForm" class="modal-form"><div class="modal-head"><div><p class="kicker">MENU EDITOR</p><h2 id="menuModalTitle">메뉴 등록</h2></div><button type="button" class="close-button" data-close>×</button></div><input id="menuId" type="hidden"><label>메뉴 이름<input id="menuName" required></label><div class="field-pair"><label>가격<input id="menuPrice" type="number" min="0" required></label><label>재고<input id="menuStock" type="number" min="0" required></label></div><label>설명<textarea id="menuDescription" rows="3"></textarea></label><button class="primary-button api-action" type="submit"><span>서버에 저장</span><small id="menuApiHint">POST /api/menus</small></button></form></dialog>
+  <dialog id="orderDialog"><div class="modal-form wide"><div class="modal-head"><div><p class="kicker">ORDER DETAIL</p><h2 id="orderModalTitle">주문 상세</h2></div><button type="button" class="close-button" data-close>×</button></div><div id="orderModalBody"></div></div></dialog>
+  <dialog id="addressDialog"><form id="addressForm" class="modal-form"><div class="modal-head"><div><p class="kicker">SHIPPING ADDRESS</p><h2>배송지 변경</h2></div><button type="button" class="close-button" data-close>×</button></div><input id="addressOrderId" type="hidden"><input id="addressEmail" type="hidden"><label>주소<input id="newAddress" required></label><label>우편번호<input id="newZip" required></label><button class="primary-button api-action" type="submit"><span>실제 배송지 변경</span><small>PATCH /api/orders/{id}/shipping-address</small></button></form></dialog>
+  <dialog id="confirmDialog"><form method="dialog" class="modal-form"><div class="modal-head"><h2 id="confirmTitle">확인</h2><button value="cancel" class="close-button">×</button></div><p id="confirmMessage" class="confirm-message"></p><div class="confirm-actions"><button value="cancel" class="soft-button">돌아가기</button><button value="confirm" class="danger-button" id="confirmAction">진행</button></div></form></dialog>
+
+  <div class="toast-stack" id="toasts" aria-live="polite"></div>
+  <script src="/js/demo.js"></script>
+</body>
+</html>
