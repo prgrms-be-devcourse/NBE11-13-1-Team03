@@ -87,6 +87,15 @@ public class MenuService {
         return new MenuResponse(menu);
     }
 
+    @Transactional
+    public Menu increaseStockForCancel(Long menuId, int quantity){
+        Menu menu = menuRepository.findByIdForUpdate(menuId)
+                .orElseThrow(() -> new NotFoundException("메뉴를 찾을 수 없습니다. menuId="+menuId));
+
+        menu.increaseStock(quantity);
+        return menu;
+    }
+
     // TODO: delete
     @Transactional
     public void deleteMenu(Long menuId){

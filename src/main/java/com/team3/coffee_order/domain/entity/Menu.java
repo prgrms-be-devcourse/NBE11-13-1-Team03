@@ -62,4 +62,13 @@ public class Menu extends BaseEntity {
         this.stock-=quantity;
         this.updatedAt = LocalDateTime.now();
     }
+
+    //상품 재고 복구
+    public void increaseStock(int quantity){
+        if(quantity <= 0){
+            throw new InvalidArgumentException("복구 수량은 1개 이상이어야 합니다.");
+        }
+        this.stock += quantity;
+        this.updatedAt = LocalDateTime.now();
+    }
 }
