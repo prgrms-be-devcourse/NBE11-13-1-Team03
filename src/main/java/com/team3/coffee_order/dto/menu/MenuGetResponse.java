@@ -11,4 +11,5 @@ public class MenuGetResponse {
     private int price;
     private int stock;
     private String description;
+    private String imageUrl;
 }

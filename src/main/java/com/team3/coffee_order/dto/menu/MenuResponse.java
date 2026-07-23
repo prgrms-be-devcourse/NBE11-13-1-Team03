@@ -12,6 +12,7 @@ public class MenuResponse {
     private final Integer price;
     private final Integer stock;
     private final String description;
+    private final String imageUrl;
     private final LocalDateTime createdAt;
     private final LocalDateTime updatedAt;
 
@@ -21,6 +22,7 @@ public class MenuResponse {
         this.price = menu.getPrice();
         this.stock = menu.getStock();
         this.description = menu.getDescription();
+        this.imageUrl = menu.getImageUrl();
         this.createdAt = menu.getCreatedAt();
         this.updatedAt = menu.getUpdatedAt();
     }
