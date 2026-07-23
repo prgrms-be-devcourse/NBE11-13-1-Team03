@@ -54,7 +54,7 @@ public class OrderService {
         LocalDateTime windowStart = windowEnd.minusDays(1);
 
         // 변경 전: orderRepository.findByCustomerAndCreatedAtBetween(customer, windowStart, windowEnd)
-        Order order = orderRepository.findByCustomerAndCreatedAtBetweenAndDeletedFalse(customer, windowStart, windowEnd)
+        Order order = orderRepository.findByCustomerAndStatusAndCreatedAtBetweenAndDeletedFalse(customer, OrderStatus.ORDERED, windowStart, windowEnd)
                 .orElseGet(() -> orderRepository.save(
                         new Order(customer, OrderStatus.ORDERED, request.getAddress(), request.getZipCode())));
 
@@ -224,6 +224,17 @@ public class OrderService {
                         )
                 );
 
+        if (order.getStatus() != OrderStatus.ORDERED) {
+            throw new InvalidArgumentException("ORDERED 상태의 주문만 취소할 수 있습니다.");
+        }
+
+        for (OrderItem orderItem : order.getOrderItems()) {
+            menuService.increaseStockForCancel(
+                    orderItem.getMenu().getId(),
+                    orderItem.getQuantity()
+            );
+        }
+
         order.updateStatus(OrderStatus.CANCELED);
 
         return new OrderStatusResponse(order);
@@ -254,6 +265,8 @@ public class OrderService {
 
         return new OrderAddressResponse(order);
     }
+
+
 
 
     // TODO: delete
