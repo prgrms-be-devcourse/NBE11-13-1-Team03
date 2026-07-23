@@ -77,12 +77,28 @@
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  object-fit: cover;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
   background: #eee8dc;
 }
 
-.admin-menu-image.missing {
-  visibility: hidden;
+.admin-menu-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.admin-menu-image span {
+  display: none;
+}
+
+.admin-menu-image.fallback img {
+  display: none;
+}
+
+.admin-menu-image.fallback span {
+  display: block;
 }
 
 .modal-form select {
