@@ -89,18 +89,13 @@
           <label>실험 메뉴<select id="raceMenu" required></select></label>
           <div class="stock-readout"><span>현재 실제 재고</span><strong id="raceStock">—</strong></div>
           <div class="race-mode-toggle" role="radiogroup" aria-label="동시성 제어 모드">
-            <label class="mode-option"><input type="radio" name="raceMode" value="lock" checked><span><b>비관적 락 적용</b><small>실제 주문 생성 · POST /api/orders</small></span></label>
-            <label class="mode-option"><input type="radio" name="raceMode" value="no-lock"><span><b>락 없음 (비교용)</b><small>데모 전용 API · 재고만 직접 차감</small></span></label>
+            <label class="mode-option"><input type="radio" name="raceMode" value="lock" checked><span><b>비관적 락 적용</b><small>데모 전용 API · SELECT ... FOR UPDATE</small></span></label>
+            <label class="mode-option"><input type="radio" name="raceMode" value="no-lock"><span><b>락 없음 (비교용)</b><small>데모 전용 API · 락 없이 조회 후 차감</small></span></label>
           </div>
           <div class="field-pair"><label>동시 요청 수<input id="raceRequests" type="number" min="2" max="30" value="10" required></label><label>요청당 수량<input id="raceQuantity" type="number" min="1" value="1" required></label></div>
-          <div id="raceOrderFields">
-            <label>수신 Gmail 주소<input id="raceEmail" type="email" placeholder="yourname@gmail.com"><small>각 요청은 Gmail +별칭으로 분리되며 모두 같은 받은편지함으로 전달됩니다.</small></label>
-            <label>배송 주소<input id="raceAddress" value="서울시 성동구 동시성로 10"></label>
-            <label>우편번호<input id="raceZip" value="04783"></label>
-          </div>
-          <p class="race-mode-note" id="raceModeNote" hidden>락 없음 모드는 실제 주문을 만들지 않고, 메뉴 재고만 동시에 차감해서 lost update 여부만 비교합니다.</p>
+          <p class="race-mode-note">두 모드 모두 실제 주문은 생성하지 않고, 같은 메뉴의 재고를 동시에 차감하는 것만 비교합니다. 변수는 오직 "락 유무" 하나입니다.</p>
           <div class="race-estimate" id="raceEstimate"></div>
-          <button class="primary-button api-action" id="runRace" type="submit"><span id="runRaceLabel">동시 주문 실행</span><small id="runRaceHint">Promise.allSettled · POST /api/orders</small></button>
+          <button class="primary-button api-action" id="runRace" type="submit"><span id="runRaceLabel">동시 재고 차감 실행</span><small id="runRaceHint">Promise.allSettled · POST /api/demo/concurrency</small></button>
         </form>
         <div class="race-stage">
           <div class="race-before-after"><div><span>실험 전 재고</span><strong id="beforeStock">—</strong></div><div class="flow-arrow">→</div><div><span>실험 후 재고</span><strong id="afterStock">—</strong></div></div>
